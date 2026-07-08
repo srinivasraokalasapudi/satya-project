@@ -35,22 +35,4 @@ const isVerifiedUser = async (req, res, next) => {
     }
 }
 
-// Restricts a route to specific user roles, e.g. router.post("/", isVerifiedUser, restrictTo("Admin"), createStaff)
-// Must run after isVerifiedUser, since it relies on req.user being set.
-const restrictTo = (...allowedRoles) => {
-    return (req, res, next) => {
-        if (!req.user) {
-            const error = createHttpError(401, "Please provide token!");
-            return next(error);
-        }
-
-        if (!allowedRoles.includes(req.user.role)) {
-            const error = createHttpError(403, "You do not have permission to perform this action!");
-            return next(error);
-        }
-
-        next();
-    }
-}
-
-module.exports = { isVerifiedUser, restrictTo };
+module.exports = { isVerifiedUser };

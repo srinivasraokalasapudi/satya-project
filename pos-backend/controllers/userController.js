@@ -20,16 +20,8 @@ const register = async (req, res, next) => {
             return next(error);
         }
 
-        // The very first account ever created on a fresh install is the
-        // restaurant owner, so it always becomes "Admin" regardless of
-        // whatever role the signup form sent. Every account after that
-        // keeps the requested role (defaults to "Waiter" from the
-        // signup form) so random sign-ups can never grant themselves
-        // Admin access.
-        const isFirstUser = (await User.countDocuments()) === 0;
-        const finalRole = isFirstUser ? "Admin" : role;
 
-        const user = { name, phone, email, password, role: finalRole };
+        const user = { name, phone, email, password, role };
         const newUser = User(user);
         await newUser.save();
 
