@@ -9,12 +9,27 @@ const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-const io = new Server(server, {
-  cors: {
-    origin: clientUrl,
-    credentials: true,
+// Allow both local dev and deployed frontend origins.
+// process.env.CLIENT_URL can hold a single URL or a comma-separated list.
+const allowedOrigins = [
+  "http://localhost:5173",
+  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",").map((u) => u.trim()) : []),
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow requests with no origin (e.g. curl, mobile apps, server-to-server)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    }
   },
+  credentials: true,
+};
+
+const io = new Server(server, {
+  cors: corsOptions,
 });
 
 app.set("io", io);
@@ -27,12 +42,7 @@ connectDB();
 // =========================
 // Middlewares
 // =========================
-app.use(
-  cors({
-    origin: clientUrl,
-    credentials: true,
-  })
-);
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -115,6 +125,5 @@ server.listen(PORT, () => {
   console.log("=======================================");
   console.log("🚀 Satya 5-Star Hotel POS Backend");
   console.log(`🌐 Server Running : http://localhost:${PORT}`);
-  console.log("✅ Database Connected");
   console.log("=======================================");
 });
