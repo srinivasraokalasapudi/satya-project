@@ -1,0 +1,602 @@
+[
+  {
+    "name": "Paneer Butter Masala",
+    "category": "Main Course",
+    "price": 47,
+    "image": "/assets/foods/1.jpeg"
+  },
+  {
+    "name": "Palak Paneer",
+    "category": "Main Course",
+    "price": 54,
+    "image": "/assets/foods/2.jpeg"
+  },
+  {
+    "name": "Kadai Paneer",
+    "category": "Main Course",
+    "price": 61,
+    "image": "/assets/foods/3.jpeg"
+  },
+  {
+    "name": "Shahi Paneer",
+    "category": "Main Course",
+    "price": 68,
+    "image": "/assets/foods/4.jpeg"
+  },
+  {
+    "name": "Matar Paneer",
+    "category": "Main Course",
+    "price": 75,
+    "image": "/assets/foods/5.jpeg"
+  },
+  {
+    "name": "Paneer Tikka",
+    "category": "Main Course",
+    "price": 82,
+    "image": "/assets/foods/6.jpeg"
+  },
+  {
+    "name": "Paneer Bhurji",
+    "category": "Main Course",
+    "price": 89,
+    "image": "/assets/foods/7.jpeg"
+  },
+  {
+    "name": "Malai Kofta",
+    "category": "Main Course",
+    "price": 96,
+    "image": "/assets/foods/8.jpeg"
+  },
+  {
+    "name": "Veg Kolhapuri",
+    "category": "Main Course",
+    "price": 103,
+    "image": "/assets/foods/9.jpeg"
+  },
+  {
+    "name": "Mix Veg Curry",
+    "category": "Main Course",
+    "price": 110,
+    "image": "/assets/foods/10.jpeg"
+  },
+  {
+    "name": "Dal Tadka",
+    "category": "Main Course",
+    "price": 117,
+    "image": "/assets/foods/11.jpeg"
+  },
+  {
+    "name": "Dal Fry",
+    "category": "Main Course",
+    "price": 124,
+    "image": "/assets/foods/12.jpeg"
+  },
+  {
+    "name": "Rajma Masala",
+    "category": "Main Course",
+    "price": 131,
+    "image": "/assets/foods/13.jpeg"
+  },
+  {
+    "name": "Chana Masala",
+    "category": "Main Course",
+    "price": 138,
+    "image": "/assets/foods/14.jpeg"
+  },
+  {
+    "name": "Aloo Gobi",
+    "category": "Main Course",
+    "price": 145,
+    "image": "/assets/foods/15.jpeg"
+  },
+  {
+    "name": "Aloo Matar",
+    "category": "Main Course",
+    "price": 152,
+    "image": "/assets/foods/16.jpeg"
+  },
+  {
+    "name": "Bhindi Masala",
+    "category": "Main Course",
+    "price": 159,
+    "image": "/assets/foods/17.jpeg"
+  },
+  {
+    "name": "Baingan Bharta",
+    "category": "Main Course",
+    "price": 166,
+    "image": "/assets/foods/18.jpeg"
+  },
+  {
+    "name": "Veg Jalfrezi",
+    "category": "Main Course",
+    "price": 173,
+    "image": "/assets/foods/19.jpeg"
+  },
+  {
+    "name": "Navratan Korma",
+    "category": "Main Course",
+    "price": 180,
+    "image": "/assets/foods/20.jpeg"
+  },
+  {
+    "name": "Veg Biryani",
+    "category": "Rice",
+    "price": 187,
+    "image": "/assets/foods/21.jpeg"
+  },
+  {
+    "name": "Jeera Rice",
+    "category": "Rice",
+    "price": 194,
+    "image": "/assets/foods/22.jpeg"
+  },
+  {
+    "name": "Veg Pulao",
+    "category": "Rice",
+    "price": 201,
+    "image": "/assets/foods/23.jpeg"
+  },
+  {
+    "name": "Steamed Rice",
+    "category": "Rice",
+    "price": 208,
+    "image": "/assets/foods/24.jpeg"
+  },
+  {
+    "name": "Lemon Rice",
+    "category": "Rice",
+    "price": 215,
+    "image": "/assets/foods/25.jpeg"
+  },
+  {
+    "name": "Curd Rice",
+    "category": "Rice",
+    "price": 222,
+    "image": "/assets/foods/26.jpeg"
+  },
+  {
+    "name": "Tomato Rice",
+    "category": "Rice",
+    "price": 229,
+    "image": "/assets/foods/27.jpeg"
+  },
+  {
+    "name": "Veg Fried Rice",
+    "category": "Rice",
+    "price": 236,
+    "image": "/assets/foods/28.jpeg"
+  },
+  {
+    "name": "Schezwan Fried Rice",
+    "category": "Rice",
+    "price": 243,
+    "image": "/assets/foods/29.jpeg"
+  },
+  {
+    "name": "Mushroom Fried Rice",
+    "category": "Rice",
+    "price": 250,
+    "image": "/assets/foods/30.jpeg"
+  },
+  {
+    "name": "Hakka Noodles",
+    "category": "Chinese",
+    "price": 257,
+    "image": "/assets/foods/31.jpeg"
+  },
+  {
+    "name": "Schezwan Noodles",
+    "category": "Chinese",
+    "price": 44,
+    "image": "/assets/foods/32.jpeg"
+  },
+  {
+    "name": "Veg Chow Mein",
+    "category": "Chinese",
+    "price": 51,
+    "image": "/assets/foods/33.jpeg"
+  },
+  {
+    "name": "Veg Manchurian",
+    "category": "Chinese",
+    "price": 58,
+    "image": "/assets/foods/34.jpeg"
+  },
+  {
+    "name": "Gobi Manchurian",
+    "category": "Chinese",
+    "price": 65,
+    "image": "/assets/foods/35.jpeg"
+  },
+  {
+    "name": "Chilli Paneer",
+    "category": "Chinese",
+    "price": 72,
+    "image": "/assets/foods/36.jpeg"
+  },
+  {
+    "name": "Spring Rolls",
+    "category": "Chinese",
+    "price": 79,
+    "image": "/assets/foods/37.jpeg"
+  },
+  {
+    "name": "Veg Momos",
+    "category": "Chinese",
+    "price": 86,
+    "image": "/assets/foods/38.jpeg"
+  },
+  {
+    "name": "Honey Chilli Potato",
+    "category": "Chinese",
+    "price": 93,
+    "image": "/assets/foods/39.jpeg"
+  },
+  {
+    "name": "Crispy Corn",
+    "category": "Chinese",
+    "price": 100,
+    "image": "/assets/foods/40.jpeg"
+  },
+  {
+    "name": "Masala Dosa",
+    "category": "South Indian",
+    "price": 107,
+    "image": "/assets/foods/41.jpeg"
+  },
+  {
+    "name": "Plain Dosa",
+    "category": "South Indian",
+    "price": 114,
+    "image": "/assets/foods/42.jpeg"
+  },
+  {
+    "name": "Mysore Masala Dosa",
+    "category": "South Indian",
+    "price": 121,
+    "image": "/assets/foods/43.jpeg"
+  },
+  {
+    "name": "Rava Dosa",
+    "category": "South Indian",
+    "price": 128,
+    "image": "/assets/foods/44.jpeg"
+  },
+  {
+    "name": "Onion Dosa",
+    "category": "South Indian",
+    "price": 135,
+    "image": "/assets/foods/45.jpeg"
+  },
+  {
+    "name": "Idli",
+    "category": "South Indian",
+    "price": 142,
+    "image": "/assets/foods/46.jpeg"
+  },
+  {
+    "name": "Medu Vada",
+    "category": "South Indian",
+    "price": 149,
+    "image": "/assets/foods/47.jpeg"
+  },
+  {
+    "name": "Uttapam",
+    "category": "South Indian",
+    "price": 156,
+    "image": "/assets/foods/48.jpeg"
+  },
+  {
+    "name": "Pongal",
+    "category": "South Indian",
+    "price": 163,
+    "image": "/assets/foods/49.jpeg"
+  },
+  {
+    "name": "Poori Bhaji",
+    "category": "South Indian",
+    "price": 170,
+    "image": "/assets/foods/50.jpeg"
+  },
+  {
+    "name": "Chole Bhature",
+    "category": "Snacks",
+    "price": 177,
+    "image": "/assets/foods/51.jpeg"
+  },
+  {
+    "name": "Pav Bhaji",
+    "category": "Snacks",
+    "price": 184,
+    "image": "/assets/foods/52.jpeg"
+  },
+  {
+    "name": "Samosa",
+    "category": "Snacks",
+    "price": 191,
+    "image": "/assets/foods/53.jpeg"
+  },
+  {
+    "name": "Kachori",
+    "category": "Snacks",
+    "price": 198,
+    "image": "/assets/foods/54.jpeg"
+  },
+  {
+    "name": "Pani Puri",
+    "category": "Snacks",
+    "price": 205,
+    "image": "/assets/foods/55.jpeg"
+  },
+  {
+    "name": "Bhel Puri",
+    "category": "Snacks",
+    "price": 212,
+    "image": "/assets/foods/56.jpeg"
+  },
+  {
+    "name": "Dahi Puri",
+    "category": "Snacks",
+    "price": 219,
+    "image": "/assets/foods/57.jpeg"
+  },
+  {
+    "name": "Sev Puri",
+    "category": "Snacks",
+    "price": 226,
+    "image": "/assets/foods/58.jpeg"
+  },
+  {
+    "name": "Dhokla",
+    "category": "Snacks",
+    "price": 233,
+    "image": "/assets/foods/59.jpeg"
+  },
+  {
+    "name": "Khandvi",
+    "category": "Snacks",
+    "price": 240,
+    "image": "/assets/foods/60.jpeg"
+  },
+  {
+    "name": "Butter Naan",
+    "category": "Bread",
+    "price": 247,
+    "image": "/assets/foods/61.jpeg"
+  },
+  {
+    "name": "Garlic Naan",
+    "category": "Bread",
+    "price": 254,
+    "image": "/assets/foods/62.jpeg"
+  },
+  {
+    "name": "Tandoori Roti",
+    "category": "Bread",
+    "price": 41,
+    "image": "/assets/foods/63.jpeg"
+  },
+  {
+    "name": "Butter Roti",
+    "category": "Bread",
+    "price": 48,
+    "image": "/assets/foods/64.jpeg"
+  },
+  {
+    "name": "Missi Roti",
+    "category": "Bread",
+    "price": 55,
+    "image": "/assets/foods/65.jpeg"
+  },
+  {
+    "name": "Lachha Paratha",
+    "category": "Bread",
+    "price": 62,
+    "image": "/assets/foods/66.jpeg"
+  },
+  {
+    "name": "Aloo Paratha",
+    "category": "Bread",
+    "price": 69,
+    "image": "/assets/foods/67.jpeg"
+  },
+  {
+    "name": "Gobi Paratha",
+    "category": "Bread",
+    "price": 76,
+    "image": "/assets/foods/68.jpeg"
+  },
+  {
+    "name": "Paneer Paratha",
+    "category": "Bread",
+    "price": 83,
+    "image": "/assets/foods/69.jpeg"
+  },
+  {
+    "name": "Stuffed Kulcha",
+    "category": "Bread",
+    "price": 90,
+    "image": "/assets/foods/70.jpeg"
+  },
+  {
+    "name": "Veg Pizza",
+    "category": "Fast Food",
+    "price": 97,
+    "image": "/assets/foods/71.jpeg"
+  },
+  {
+    "name": "Margherita Pizza",
+    "category": "Fast Food",
+    "price": 104,
+    "image": "/assets/foods/72.jpeg"
+  },
+  {
+    "name": "Veg Burger",
+    "category": "Fast Food",
+    "price": 111,
+    "image": "/assets/foods/73.jpeg"
+  },
+  {
+    "name": "French Fries",
+    "category": "Fast Food",
+    "price": 118,
+    "image": "/assets/foods/74.jpeg"
+  },
+  {
+    "name": "Cheese Sandwich",
+    "category": "Fast Food",
+    "price": 125,
+    "image": "/assets/foods/75.jpeg"
+  },
+  {
+    "name": "Veg Club Sandwich",
+    "category": "Fast Food",
+    "price": 132,
+    "image": "/assets/foods/76.jpeg"
+  },
+  {
+    "name": "Veg Wrap",
+    "category": "Fast Food",
+    "price": 139,
+    "image": "/assets/foods/77.jpeg"
+  },
+  {
+    "name": "Falafel Wrap",
+    "category": "Fast Food",
+    "price": 146,
+    "image": "/assets/foods/78.jpeg"
+  },
+  {
+    "name": "Veg Cutlet",
+    "category": "Fast Food",
+    "price": 153,
+    "image": "/assets/foods/79.jpeg"
+  },
+  {
+    "name": "Cheese Balls",
+    "category": "Fast Food",
+    "price": 160,
+    "image": "/assets/foods/80.jpeg"
+  },
+  {
+    "name": "Gulab Jamun",
+    "category": "Dessert",
+    "price": 167,
+    "image": "/assets/foods/81.jpeg"
+  },
+  {
+    "name": "Rasmalai",
+    "category": "Dessert",
+    "price": 174,
+    "image": "/assets/foods/82.jpeg"
+  },
+  {
+    "name": "Jalebi",
+    "category": "Dessert",
+    "price": 181,
+    "image": "/assets/foods/83.jpeg"
+  },
+  {
+    "name": "Rasgulla",
+    "category": "Dessert",
+    "price": 188,
+    "image": "/assets/foods/84.jpeg"
+  },
+  {
+    "name": "Kheer",
+    "category": "Dessert",
+    "price": 195,
+    "image": "/assets/foods/85.jpeg"
+  },
+  {
+    "name": "Gajar Halwa",
+    "category": "Dessert",
+    "price": 202,
+    "image": "/assets/foods/86.jpeg"
+  },
+  {
+    "name": "Kulfi",
+    "category": "Dessert",
+    "price": 209,
+    "image": "/assets/foods/87.jpeg"
+  },
+  {
+    "name": "Vanilla Ice Cream",
+    "category": "Dessert",
+    "price": 216,
+    "image": "/assets/foods/88.jpeg"
+  },
+  {
+    "name": "Chocolate Ice Cream",
+    "category": "Dessert",
+    "price": 223,
+    "image": "/assets/foods/89.jpeg"
+  },
+  {
+    "name": "Fruit Salad",
+    "category": "Dessert",
+    "price": 230,
+    "image": "/assets/foods/90.jpeg"
+  },
+  {
+    "name": "Mango Shake",
+    "category": "Beverage",
+    "price": 237,
+    "image": "/assets/foods/91.jpeg"
+  },
+  {
+    "name": "Banana Shake",
+    "category": "Beverage",
+    "price": 244,
+    "image": "/assets/foods/92.jpeg"
+  },
+  {
+    "name": "Sweet Lassi",
+    "category": "Beverage",
+    "price": 251,
+    "image": "/assets/foods/93.jpeg"
+  },
+  {
+    "name": "Salt Lassi",
+    "category": "Beverage",
+    "price": 258,
+    "image": "/assets/foods/94.jpeg"
+  },
+  {
+    "name": "Fresh Lime Soda",
+    "category": "Beverage",
+    "price": 45,
+    "image": "/assets/foods/95.jpeg"
+  },
+  {
+    "name": "Masala Chaas",
+    "category": "Beverage",
+    "price": 52,
+    "image": "/assets/foods/96.jpeg"
+  },
+  {
+    "name": "Cold Coffee",
+    "category": "Beverage",
+    "price": 59,
+    "image": "/assets/foods/97.jpeg"
+  },
+  {
+    "name": "Filter Coffee",
+    "category": "Beverage",
+    "price": 66,
+    "image": "/assets/foods/98.jpeg"
+  },
+  {
+    "name": "Masala Tea",
+    "category": "Beverage",
+    "price": 73,
+    "image": "/assets/foods/99.jpeg"
+  },
+  {
+    "name": "Green Tea",
+    "category": "Beverage",
+    "price": 80,
+    "image": "/assets/foods/100.jpeg"
+  }
+]

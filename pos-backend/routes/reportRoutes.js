@@ -1,0 +1,11 @@
+const express=require("express");
+const router=express.Router();
+const c=require("../controllers/reportController");
+router.get("/dashboard",c.getDashboardReport);
+router.get("/sales",c.getSalesReport);
+router.get("/daily",c.getDailySales);
+router.get("/weekly",c.getWeeklySales);
+router.get("/monthly",c.getMonthlySales);
+router.get("/top-items",c.getTopSellingItems);
+router.get("/payments",c.getPaymentReport);
+module.exports=router;
