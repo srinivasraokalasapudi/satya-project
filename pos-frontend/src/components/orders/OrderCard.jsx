@@ -83,6 +83,12 @@ const OrderCard = ({ order }) => {
               {order.table?.tableNo || "N/A"}
             </p>
 
+            {order.staff?.name && (
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">
+                Staff: <span className="text-white">{order.staff.name}</span>
+              </p>
+            )}
+
           </div>
 
         </div>

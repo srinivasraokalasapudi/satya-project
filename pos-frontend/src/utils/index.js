@@ -85,6 +85,7 @@ export const buildReceiptMessage = (order) => {
     `Order ID: ${orderId}`,
     `Name: ${order.customerDetails?.name || ""}`,
     `Guests: ${order.customerDetails?.guests ?? ""}`,
+    order.staffDetails?.name ? `Served By: ${order.staffDetails.name}` : null,
     "",
     "*Items*",
     itemLines,

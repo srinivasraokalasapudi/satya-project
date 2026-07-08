@@ -103,6 +103,11 @@ const Invoice = ({ orderInfo, setShowInvoice }) => {
             <p>
               <strong>Guests:</strong> {orderInfo.customerDetails.guests}
             </p>
+            {orderInfo.staffDetails?.name && (
+              <p>
+                <strong>Served By:</strong> {orderInfo.staffDetails.name}
+              </p>
+            )}
           </div>
 
           {/* Items Summary */}

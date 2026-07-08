@@ -21,6 +21,18 @@ const orderSchema = new mongoose.Schema(
       },
     },
 
+    staff: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff",
+      required: true,
+    },
+
+    staffDetails: {
+      name: {
+        type: String,
+      },
+    },
+
     orderStatus: {
       type: String,
       enum: ["In Progress", "Ready", "Completed"],
