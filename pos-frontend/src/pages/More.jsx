@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { enqueueSnackbar } from "notistack";
 import {
@@ -44,6 +44,7 @@ import RecentActivity from "../components/more/RecentActivity";
 import VersionFooter from "../components/more/VersionFooter";
 import LogoutButton from "../components/more/LogoutButton";
 import { logout } from "../https";
+import { removeUser } from "../redux/slices/userSlice";
 
 // ----------------------------------------------------------------------
 // Section data. `path` must match an existing route in App.jsx — routes
@@ -100,6 +101,7 @@ const fadeUp = {
 
 const More = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
   const {
     todaysOrdersCount,
@@ -159,6 +161,7 @@ const More = () => {
 
       localStorage.clear();
       sessionStorage.clear();
+      dispatch(removeUser());
 
       enqueueSnackbar("Logged out successfully", {
         variant: "success",
@@ -166,9 +169,17 @@ const More = () => {
 
       navigate("/auth");
     } catch (error) {
+      // Even if the server call fails, clear the local session so the
+      // user isn't stuck signed in on a device they meant to log out of.
+      localStorage.clear();
+      sessionStorage.clear();
+      dispatch(removeUser());
+
       enqueueSnackbar("Logout failed", {
         variant: "error",
       });
+
+      navigate("/auth");
     }
   };
 
