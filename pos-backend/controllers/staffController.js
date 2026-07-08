@@ -1,5 +1,4 @@
 const Staff = require("../models/Staff");
-const Order = require("../models/orderModel");
 
 // Get All Staff
 exports.getStaff = async (req, res, next) => {
@@ -10,37 +9,6 @@ exports.getStaff = async (req, res, next) => {
       success: true,
       count: staff.length,
       data: staff,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Get a single staff member's completed order history
-exports.getStaffOrders = async (req, res, next) => {
-  try {
-    const staff = await Staff.findById(req.params.id);
-
-    if (!staff) {
-      return res.status(404).json({
-        success: false,
-        message: "Staff not found",
-      });
-    }
-
-    const orders = await Order.find({
-      staff: staff._id,
-      orderStatus: "Completed",
-    })
-      .sort({ createdAt: -1 })
-      .select("customerDetails bills orderStatus orderDate createdAt");
-
-    res.json({
-      success: true,
-      data: {
-        staff,
-        orders,
-      },
     });
   } catch (error) {
     next(error);

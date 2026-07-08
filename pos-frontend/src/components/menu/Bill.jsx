@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
 import { satya as addOrderRedux } from "../../redux/slices/orderSlice";
 
@@ -15,7 +15,6 @@ import {
   createOrderRazorpay,
   verifyPaymentRazorpay,
   updateTable,
-  getStaff,
 } from "../../https";
 
 import Invoice from "../invoice/Invoice";
@@ -50,18 +49,6 @@ const Bill = () => {
   const [showInvoice, setShowInvoice] = useState(false);
   const [orderInfo, setOrderInfo] = useState(null);
   const [showWhatsAppPrompt, setShowWhatsAppPrompt] = useState(false);
-  const [selectedStaffId, setSelectedStaffId] = useState("");
-
-  // ---------------- AVAILABLE STAFF ----------------
-
-  const { data: staffResData } = useQuery({
-    queryKey: ["staff"],
-    queryFn: async () => await getStaff(),
-  });
-
-  const availableStaff = (staffResData?.data?.data || []).filter(
-    (member) => member.status === "Active"
-  );
 
   // ---------------- TABLE UPDATE ----------------
 
@@ -102,8 +89,6 @@ const Bill = () => {
     orderId: data._id,
     status: "Booked",
   });
-
-  setSelectedStaffId("");
 
   enqueueSnackbar("Order Placed Successfully!", {
     variant: "success",
@@ -156,13 +141,6 @@ const Bill = () => {
       return;
     }
 
-    if (!selectedStaffId) {
-      enqueueSnackbar("Please select a staff member!", {
-        variant: "warning",
-      });
-      return;
-    }
-
     if (!paymentMethod) {
       enqueueSnackbar("Please select a payment method!", {
         variant: "warning",
@@ -188,7 +166,6 @@ const Bill = () => {
       items: cartData,
       table: customerData.table.tableId,
       paymentMethod,
-      staff: selectedStaffId,
     };
 
     // ---------------- CASH ----------------
@@ -329,31 +306,6 @@ const Bill = () => {
               ₹{totalPriceWithTax.toFixed(2)}
             </span>
           </div>
-        </div>
-
-        <div className="mt-5">
-          <label className="block text-[#ababab] text-sm mb-2">
-            Staff
-          </label>
-
-          <select
-            value={selectedStaffId}
-            onChange={(e) => setSelectedStaffId(e.target.value)}
-            className="w-full bg-[#2a2a2a] text-white rounded-lg px-4 py-3 outline-none disabled:opacity-50"
-            disabled={availableStaff.length === 0}
-          >
-            <option value="">
-              {availableStaff.length === 0
-                ? "No staff available"
-                : "Select staff"}
-            </option>
-
-            {availableStaff.map((member) => (
-              <option key={member._id} value={member._id}>
-                {member.name} — {member.role}
-              </option>
-            ))}
-          </select>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-5">

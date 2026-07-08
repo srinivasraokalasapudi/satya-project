@@ -4,8 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon app.js",
-    "start": "node app.js",
-    "seed:customers": "node scripts/seedCustomers.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
