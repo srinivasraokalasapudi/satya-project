@@ -17,7 +17,12 @@ const Header = () => {
 
   const logoutMutation = useMutation({
     mutationFn: logout,
-    onSuccess: () => {
+    // Always clear the local session, whether or not the server call
+    // succeeds. Mobile networks (and a sleeping Render free-tier
+    // backend) can make the logout request fail or time out, and in
+    // that case the user should still be signed out locally rather
+    // than appearing stuck when they tap "logout".
+    onSettled: () => {
       localStorage.removeItem("accessToken");
       dispatch(removeUser());
       navigate("/auth");

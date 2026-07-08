@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
 import { enqueueSnackbar } from "notistack";
 import {
@@ -44,6 +44,7 @@ import RecentActivity from "../components/more/RecentActivity";
 import VersionFooter from "../components/more/VersionFooter";
 import LogoutButton from "../components/more/LogoutButton";
 import { logout } from "../https";
+import { removeUser } from "../redux/slices/userSlice";
 
 // ----------------------------------------------------------------------
 // Section data. `path` must match an existing route in App.jsx — routes
@@ -100,6 +101,7 @@ const fadeUp = {
 
 const More = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
   const {
     todaysOrdersCount,
@@ -156,19 +158,24 @@ const More = () => {
   const handleLogout = async () => {
     try {
       await logout();
-
+    } catch (error) {
+      // The server call clears an httpOnly cookie the mobile browser
+      // usually never even received (third-party cookies are commonly
+      // blocked cross-domain), and it can fail outright if the network
+      // is flaky or a free-tier backend is asleep. Either way, the
+      // local session below still needs to be cleared so the user
+      // isn't stuck looking logged in.
+      console.log(error);
+    } finally {
       localStorage.clear();
       sessionStorage.clear();
+      dispatch(removeUser());
 
       enqueueSnackbar("Logged out successfully", {
         variant: "success",
       });
 
       navigate("/auth");
-    } catch (error) {
-      enqueueSnackbar("Logout failed", {
-        variant: "error",
-      });
     }
   };
 
