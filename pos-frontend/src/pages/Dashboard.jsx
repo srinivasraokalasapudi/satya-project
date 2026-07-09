@@ -11,10 +11,11 @@ import { io } from "socket.io-client";
 import Metrics from "../components/dashboard/Metrics";
 import RecentOrders from "../components/dashboard/RecentOrders";
 import FullScreenLoader from "../components/shared/FullScreenLoader";
+import StaffManagement from "./Management/StaffManagement";
 
 import { getDashboardStats } from "../https/dashboard";
 
-const tabs = ["Metrics", "Orders", "Payments"];
+const tabs = ["Metrics", "Orders", "Payments", "Staff"];
 
 const Dashboard = () => {
   useEffect(() => {
@@ -138,6 +139,7 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+      {activeTab === "Staff" && <StaffManagement />}
     </div>
   );
 };
