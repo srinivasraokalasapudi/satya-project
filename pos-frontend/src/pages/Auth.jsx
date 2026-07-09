@@ -58,7 +58,7 @@ const Auth = () => {
             }`}
           >
             <FaUserTie />
-            Employee
+            Customer
           </button>
           <button
             type="button"
@@ -73,7 +73,7 @@ const Auth = () => {
         </div>
 
         <h2 className="text-2xl sm:text-4xl text-center mt-8 font-semibold text-yellow-400 mb-10">
-          {isAdminTab ? "Admin Login" : isRegister ? "Employee Sign Up" : "Employee Login"}
+          {isAdminTab ? "Admin Login" : isRegister ? "Customer Sign Up" : "Customer Login"}
         </h2>
 
         {/* Components */}

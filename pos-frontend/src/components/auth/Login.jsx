@@ -45,7 +45,7 @@ const Login = ({ requireRole } = {}) => {
               // best-effort cleanup, ignore failures
             }
             enqueueSnackbar(
-              `This account isn't an ${requireRole}. Use Employee Login instead.`,
+              `This account isn't an ${requireRole}. Use Customer Login instead.`,
               { variant: "error" }
             );
             return;
@@ -68,7 +68,7 @@ const Login = ({ requireRole } = {}) => {
       <form onSubmit={handleSubmit}>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            {requireRole === "Admin" ? "Admin Email" : "Employee Email"}
+            {requireRole === "Admin" ? "Admin Email" : "Customer Email"}
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -76,7 +76,7 @@ const Login = ({ requireRole } = {}) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder={requireRole === "Admin" ? "Enter admin email" : "Enter employee email"}
+              placeholder={requireRole === "Admin" ? "Enter admin email" : "Enter customer email"}
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />

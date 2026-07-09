@@ -77,7 +77,7 @@ const Register = ({ setIsRegister, isAdminCreating = false }) => {
       <form onSubmit={handleSubmit}>
         <div>
           <label className="block text-[#ababab] mb-2 text-sm font-medium">
-            Employee Name
+            Customer Name
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -85,7 +85,7 @@ const Register = ({ setIsRegister, isAdminCreating = false }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Enter employee name"
+              placeholder="Enter customer name"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
@@ -93,7 +93,7 @@ const Register = ({ setIsRegister, isAdminCreating = false }) => {
         </div>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Employee Email
+            Customer Email
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -101,7 +101,7 @@ const Register = ({ setIsRegister, isAdminCreating = false }) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter employee email"
+              placeholder="Enter customer email"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
@@ -109,7 +109,7 @@ const Register = ({ setIsRegister, isAdminCreating = false }) => {
         </div>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Employee Phone
+            Customer Phone
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -117,7 +117,7 @@ const Register = ({ setIsRegister, isAdminCreating = false }) => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="Enter employee phone"
+              placeholder="Enter customer phone"
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
