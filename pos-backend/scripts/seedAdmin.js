@@ -21,7 +21,7 @@ const config = require("../config/config");
 const User = require("../models/userModel");
 
 const ADMIN_NAME = process.env.ADMIN_NAME || "Satya";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "gmail-satya@gmail.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "satya@gmail.com";
 const ADMIN_PHONE = process.env.ADMIN_PHONE || "9999999999";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Satya@123569";
 
