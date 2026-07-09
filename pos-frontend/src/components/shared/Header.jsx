@@ -24,6 +24,12 @@ const Header = () => {
     },
     onError: (error) => {
       console.log(error);
+      // Even if the server call fails (expired token, network hiccup,
+      // blocked cross-domain cookie, etc.), still clear the local
+      // session so the user isn't stuck unable to log out.
+      localStorage.removeItem("accessToken");
+      dispatch(removeUser());
+      navigate("/auth");
     },
   });
 

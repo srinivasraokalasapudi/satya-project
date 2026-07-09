@@ -94,8 +94,13 @@ const getUserData = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        
-        res.clearCookie('accessToken');
+
+        const isProduction = process.env.NODE_ENV === "production";
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            sameSite: isProduction ? "none" : "lax",
+            secure: isProduction,
+        });
         res.status(200).json({success: true, message: "User logout successfully!"});
 
     } catch (error) {
