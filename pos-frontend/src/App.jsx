@@ -28,6 +28,7 @@ import Header from "./components/shared/Header";
 import { useSelector } from "react-redux";
 import useLoadData from "./hooks/useLoadData";
 import FullScreenLoader from "./components/shared/FullScreenLoader";
+import { enqueueSnackbar } from "notistack";
 
 function Layout() {
   const isLoading = useLoadData();
@@ -93,7 +94,7 @@ function Layout() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoutes>
+            <ProtectedRoutes adminOnly>
               <Dashboard />
             </ProtectedRoutes>
           }
@@ -198,11 +199,23 @@ function Layout() {
   );
 }
 
-function ProtectedRoutes({ children }) {
-  const { isAuth } = useSelector((state) => state.user);
+function ProtectedRoutes({ children, adminOnly = false }) {
+  const { isAuth, role } = useSelector((state) => state.user);
 
   if (!isAuth) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // Some pages (e.g. the analytics Dashboard) are Admin-only. Being
+  // logged in isn't enough to view them - a non-Admin who lands here
+  // (typically by typing/pasting the URL directly, since normal nav
+  // links to these pages aren't shown to them) gets bounced back to
+  // Home instead of seeing Admin data.
+  if (adminOnly && role !== "Admin") {
+    enqueueSnackbar("You don't have permission to view that page.", {
+      variant: "error",
+    });
+    return <Navigate to="/" replace />;
   }
 
   return children;
