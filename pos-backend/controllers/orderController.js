@@ -5,6 +5,7 @@ const Order = require("../models/orderModel");
 const Table = require("../models/tableModel");
 const Stats = require("../models/statsModel");
 const Staff = require("../models/Staff");
+const Payment = require("../models/paymentModel");
 const { startOfDay, startOfWeek, startOfMonth } = require("../utils/dateRanges");
 // =======================================
 // Helpers
@@ -201,6 +202,23 @@ const addOrder = async (req, res, next) => {
       tableData.status = "Occupied";
       tableData.currentOrder = createdOrder._id;
       await tableData.save();
+    }
+
+    // Cash orders never touch Razorpay, so nothing writes a Payment record
+    // for them the way verifyPayment does for online orders. Record one
+    // here so cash transactions also show up in Recent Transactions.
+    if (paymentMethod && paymentMethod.toLowerCase() === "cash") {
+      await Payment.create({
+        paymentId: `cash_${createdOrder._id}`,
+        orderId: createdOrder._id.toString(),
+        amount: createdOrder.bills?.totalWithTax || 0,
+        currency: "INR",
+        status: "captured",
+        method: "Cash",
+        email: customerDetails?.email,
+        contact: customerDetails?.phone,
+        createdAt: new Date(),
+      });
     }
 
     emitDashboardUpdate(req, "order:created", {

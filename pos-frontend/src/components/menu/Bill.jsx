@@ -245,7 +245,14 @@ const Bill = () => {
 
         handler: async (response) => {
           try {
-            await verifyPaymentRazorpay(response);
+            await verifyPaymentRazorpay({
+              ...response,
+              amount: totalPriceWithTax.toFixed(2),
+              currency: data.order.currency,
+              method: "Online",
+              email: customerData.customerEmail,
+              contact: customerData.customerPhone,
+            });
 
             orderMutation.mutate({
               ...orderData,

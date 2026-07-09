@@ -40,8 +40,16 @@ const createOrder = async (req, res) => {
 
 const verifyPayment = async (req, res, next) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
-      req.body;
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      amount,
+      currency,
+      method,
+      email,
+      contact,
+    } = req.body;
 
     const expectedSignature = crypto
       .createHmac("sha256", config.razorpaySecretKey)
@@ -49,6 +57,29 @@ const verifyPayment = async (req, res, next) => {
       .digest("hex");
 
     if (expectedSignature === razorpay_signature) {
+      // Record the transaction right away so it shows up on the dashboard,
+      // even if the Razorpay webhook is not configured/reachable.
+      // Guard against double-inserts in case the webhook also fires later.
+      const existingPayment = await Payment.findOne({
+        paymentId: razorpay_payment_id,
+      });
+
+      if (!existingPayment) {
+        const newPayment = new Payment({
+          paymentId: razorpay_payment_id,
+          orderId: razorpay_order_id,
+          amount: amount ? Number(amount) : undefined,
+          currency: currency || "INR",
+          status: "captured",
+          method: method || "Online",
+          email,
+          contact,
+          createdAt: new Date(),
+        });
+
+        await newPayment.save();
+      }
+
       res.json({ success: true, message: "Payment verified successfully!" });
     } else {
       const error = createHttpError(400, "Payment verification failed!");
