@@ -114,14 +114,12 @@ export const getWhatsAppReceiptUrl = (order) => {
 // =========================
 
 // Merchant VPA/name are configurable via env so each deployment can point
-// at its own UPI ID without a code change. The fallback below is NOT a
-// real, payable UPI ID — it's just enough to keep the flow from crashing
-// before a real VPA is configured. Every UPI app validates the payee VPA
-// against NPCI before accepting a scan, so a QR built from this fallback
-// will always be rejected ("Invalid QR code") until VITE_UPI_ID is set to
-// a real registered UPI ID.
+// at its own UPI ID without a code change. Defaults to the hotel's real
+// UPI ID below; override with VITE_UPI_ID / VITE_UPI_PAYEE_NAME if that
+// ever changes (e.g. moving to a dedicated business UPI handle).
+const REAL_UPI_VPA = "9515193331@ptyes";
 const DEMO_UPI_VPA = "satya5starhotel@okhdfcbank";
-const UPI_PAYEE_VPA = import.meta.env.VITE_UPI_ID || DEMO_UPI_VPA;
+const UPI_PAYEE_VPA = import.meta.env.VITE_UPI_ID || REAL_UPI_VPA;
 const UPI_PAYEE_NAME = import.meta.env.VITE_UPI_PAYEE_NAME || "Satya 5-Star Hotel";
 
 // True whenever VITE_UPI_ID hasn't been set to a real business UPI ID, so
