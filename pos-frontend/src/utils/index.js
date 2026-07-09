@@ -109,8 +109,56 @@ export const getWhatsAppReceiptUrl = (order) => {
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 };
 
-// Note: UPI payments now go through the Razorpay checkout (see Bill.jsx)
-// instead of a static upi://pay deep link straight to the merchant VPA, so
-// a payment can be auto-detected and the order auto-placed. The old
-// direct-VPA QR helpers were removed since a direct P2P/P2M UPI transfer
-// never notifies the server - there was nothing for them to hook into.
+// =========================
+// UPI Payment
+// =========================
+
+// Merchant VPA/name are configurable via env so each deployment can point
+// at its own UPI ID without a code change. Defaults to the hotel's real
+// UPI ID below; override with VITE_UPI_ID / VITE_UPI_PAYEE_NAME if that
+// ever changes (e.g. moving to a dedicated business UPI handle).
+const REAL_UPI_VPA = "9515193331@ptyes";
+const DEMO_UPI_VPA = "satya5starhotel@okhdfcbank";
+const UPI_PAYEE_VPA = import.meta.env.VITE_UPI_ID || REAL_UPI_VPA;
+const UPI_PAYEE_NAME = import.meta.env.VITE_UPI_PAYEE_NAME || "Satya 5-Star Hotel";
+
+// True whenever VITE_UPI_ID hasn't been set to a real business UPI ID, so
+// the UI can warn the waiter instead of handing out a QR that will never
+// scan successfully.
+export const isUpiDemoVpa = UPI_PAYEE_VPA === DEMO_UPI_VPA;
+
+// Builds a standard UPI deep link (upi://pay) that any UPI app (GPay,
+// PhonePe, Paytm, BHIM, etc.) can open directly to pre-fill the payment.
+//
+// IMPORTANT: this must be strict percent-encoding (spaces as %20), not
+// URLSearchParams's form-encoding (spaces as "+"). UPI apps parse this as
+// a URI, not a submitted form, and several of them reject a "+"-encoded
+// query as malformed, surfacing as "Invalid QR code" on scan even though
+// the payee VPA itself is valid.
+export const buildUpiPaymentUrl = ({ amount, note, refId }) => {
+  const params = [
+    ["pa", UPI_PAYEE_VPA], // payee VPA
+    ["pn", UPI_PAYEE_NAME], // payee name
+    ["am", Number(amount).toFixed(2)], // amount
+    ["cu", "INR"],
+  ];
+
+  if (note) params.push(["tn", note]);
+  if (refId) params.push(["tr", String(refId)]);
+
+  const query = params
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+
+  return `upi://pay?${query}`;
+};
+
+// Renders the UPI link as a scannable QR code image via a public QR
+// generator, so customers without the deep-link handoff (e.g. scanning
+
+// from a POS screen) can still pay.
+export const getUpiQrCodeUrl = (upiUrl, size = 260) => {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(
+    upiUrl
+  )}`;
+};
