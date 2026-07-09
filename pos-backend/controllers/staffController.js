@@ -1,15 +1,64 @@
 const Staff = require("../models/Staff");
+<<<<<<< HEAD
 const Order = require("../models/orderModel");
+=======
+const { startOfDay, startOfWeek, startOfMonth } = require("../utils/dateRanges");
+
+// Staff performance counters (totalOrders, totalRevenue, today/week/
+// month revenue) are updated incrementally by orderController when an
+// order is completed. The today/week/month buckets only get reset the
+// next time an order completes in a new period, so on read we correct
+// any bucket that's stale (belongs to a past day/week/month) back to
+// zero for display, without writing anything back to the database.
+const presentStaff = (staffDoc) => {
+  const now = new Date();
+  const todayStart = startOfDay(now);
+  const weekStart = startOfWeek(now);
+  const monthStart = startOfMonth(now);
+
+  const isSameDay =
+    staffDoc.todayDate &&
+    startOfDay(staffDoc.todayDate).getTime() === todayStart.getTime();
+
+  const isSameWeek =
+    staffDoc.weekStartDate &&
+    new Date(staffDoc.weekStartDate).getTime() === weekStart.getTime();
+
+  const isSameMonth =
+    staffDoc.monthStartDate &&
+    new Date(staffDoc.monthStartDate).getTime() === monthStart.getTime();
+
+  return {
+    ...staffDoc,
+    todayRevenue: isSameDay ? staffDoc.todayRevenue || 0 : 0,
+    weeklyRevenue: isSameWeek ? staffDoc.weeklyRevenue || 0 : 0,
+    monthlyRevenue: isSameMonth ? staffDoc.monthlyRevenue || 0 : 0,
+    totalOrders: staffDoc.totalOrders || 0,
+    totalRevenue: staffDoc.totalRevenue || 0,
+  };
+};
+>>>>>>> e5ee836 (Add staff selection on orders, staff CRUD, and staff revenue reports)
 
 // Get All Staff
+// Supports ?status=Active to fetch only staff who are available to be
+// assigned to an order (used by the "select staff" picker on order
+// creation).
 exports.getStaff = async (req, res, next) => {
   try {
-    const staff = await Staff.find().sort({ createdAt: -1 });
+    const { status } = req.query;
+    const query = {};
+
+    if (status) {
+      query.status = status;
+    }
+
+    const staff = await Staff.find(query).sort({ createdAt: -1 }).lean();
+    const data = staff.map(presentStaff);
 
     res.json({
       success: true,
-      count: staff.length,
-      data: staff,
+      count: data.length,
+      data,
     });
   } catch (error) {
     next(error);
@@ -61,6 +110,7 @@ exports.updateStaff = async (req, res, next) => {
 };
 
 // Staff Reports
+<<<<<<< HEAD
 // Returns, for every staff member: how many orders they've taken in
 // total, their all-time revenue from completed orders, and revenue
 // from orders they completed today.
@@ -134,6 +184,16 @@ exports.getStaffReports = async (req, res, next) => {
         todayRevenue: todayMap.get(String(staff._id)) || 0,
       };
     });
+=======
+// Returns, for every staff member: total orders taken, all-time
+// revenue, and today/this-week/this-month revenue — all read straight
+// off the Staff document's running counters (see updateStaffStats in
+// orderController), sorted by who's brought in the most revenue.
+exports.getStaffReports = async (req, res, next) => {
+  try {
+    const staffList = await Staff.find().sort({ totalRevenue: -1 }).lean();
+    const data = staffList.map(presentStaff);
+>>>>>>> e5ee836 (Add staff selection on orders, staff CRUD, and staff revenue reports)
 
     res.json({
       success: true,

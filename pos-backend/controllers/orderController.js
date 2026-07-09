@@ -5,6 +5,10 @@ const Order = require("../models/orderModel");
 const Table = require("../models/tableModel");
 const Stats = require("../models/statsModel");
 const Staff = require("../models/Staff");
+<<<<<<< HEAD
+=======
+const { startOfDay, startOfWeek, startOfMonth } = require("../utils/dateRanges");
+>>>>>>> e5ee836 (Add staff selection on orders, staff CRUD, and staff revenue reports)
 // =======================================
 // Helpers
 // =======================================
@@ -30,6 +34,55 @@ const getStats = async () => {
     }
 
     return stats;
+};
+
+// Bumps a staff member's performance counters when one of their orders
+// is completed: total orders/revenue go up forever, while today/week/
+// month buckets reset themselves once the stored bucket belongs to a
+// past period (so nothing needs a scheduled job to roll them over).
+const updateStaffStats = async (staffId, amount) => {
+  if (!staffId) return;
+
+  const staffDoc = await Staff.findById(staffId);
+
+  if (!staffDoc) return;
+
+  const now = new Date();
+  const todayStart = startOfDay(now);
+  const weekStart = startOfWeek(now);
+  const monthStart = startOfMonth(now);
+
+  if (
+    !staffDoc.todayDate ||
+    startOfDay(staffDoc.todayDate).getTime() !== todayStart.getTime()
+  ) {
+    staffDoc.todayRevenue = 0;
+    staffDoc.todayDate = todayStart;
+  }
+
+  if (
+    !staffDoc.weekStartDate ||
+    new Date(staffDoc.weekStartDate).getTime() !== weekStart.getTime()
+  ) {
+    staffDoc.weeklyRevenue = 0;
+    staffDoc.weekStartDate = weekStart;
+  }
+
+  if (
+    !staffDoc.monthStartDate ||
+    new Date(staffDoc.monthStartDate).getTime() !== monthStart.getTime()
+  ) {
+    staffDoc.monthlyRevenue = 0;
+    staffDoc.monthStartDate = monthStart;
+  }
+
+  staffDoc.totalOrders += 1;
+  staffDoc.totalRevenue += amount;
+  staffDoc.todayRevenue += amount;
+  staffDoc.weeklyRevenue += amount;
+  staffDoc.monthlyRevenue += amount;
+
+  await staffDoc.save();
 };
 
 const successResponse = (
@@ -330,6 +383,15 @@ const updateOrder = async (req, res, next) => {
       );
 
       await stats.save();
+
+      // Credit the staff member who took this order with the
+      // completed sale (total/today/week/month counters).
+      if (order.staff) {
+        await updateStaffStats(
+          order.staff,
+          Number(order.bills?.totalWithTax || 0)
+        );
+      }
 
       // Release table
 

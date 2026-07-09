@@ -26,6 +26,7 @@ const CustomerModal = ({
   const [staffId, setStaffId] = useState("");
 
   const { data: staffRes } = useQuery({
+<<<<<<< HEAD
     queryKey: ["staff-list"],
     queryFn: getStaff,
     enabled: isOpen,
@@ -34,6 +35,14 @@ const CustomerModal = ({
   const staffOptions = (staffRes?.data?.data || []).filter(
     (member) => member.status !== "Inactive"
   );
+=======
+    queryKey: ["staff-list", "active"],
+    queryFn: () => getStaff({ status: "Active" }),
+    enabled: isOpen,
+  });
+
+  const staffOptions = staffRes?.data?.data || [];
+>>>>>>> e5ee836 (Add staff selection on orders, staff CRUD, and staff revenue reports)
 
   const handleStartOrder = () => {
     if (!name.trim()) {
