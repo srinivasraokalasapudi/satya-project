@@ -204,17 +204,21 @@ const addOrder = async (req, res, next) => {
       await tableData.save();
     }
 
-    // Cash orders never touch Razorpay, so nothing writes a Payment record
-    // for them the way verifyPayment does for online orders. Record one
-    // here so cash transactions also show up in Recent Transactions.
-    if (paymentMethod && paymentMethod.toLowerCase() === "cash") {
+    // Cash and UPI orders never touch Razorpay, so nothing writes a Payment
+    // record for them the way verifyPayment does for online orders. Record
+    // one here so those transactions also show up in Recent Transactions.
+    const normalizedMethod = paymentMethod ? paymentMethod.toLowerCase() : "";
+
+    if (normalizedMethod === "cash" || normalizedMethod === "upi") {
+      const methodLabel = normalizedMethod === "upi" ? "UPI" : "Cash";
+
       await Payment.create({
-        paymentId: `cash_${createdOrder._id}`,
+        paymentId: `${normalizedMethod}_${createdOrder._id}`,
         orderId: createdOrder._id.toString(),
         amount: createdOrder.bills?.totalWithTax || 0,
         currency: "INR",
         status: "captured",
-        method: "Cash",
+        method: methodLabel,
         email: customerDetails?.email,
         contact: customerDetails?.phone,
         createdAt: new Date(),
