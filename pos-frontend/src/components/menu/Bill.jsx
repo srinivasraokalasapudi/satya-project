@@ -293,6 +293,27 @@ const Bill = () => {
         theme: {
           color: "#025cca",
         },
+
+        // Razorpay's checkout only shows the payment methods enabled on
+        // the merchant's dashboard, in whatever order it decides. That's
+        // why UPI can silently disappear from "Payment Options" even
+        // though it's a standard method - explicitly pinning a UPI block
+        // here forces it to render alongside the default blocks instead
+        // of relying on dashboard config/ordering.
+        config: {
+          display: {
+            blocks: {
+              upi: {
+                name: "Pay via UPI",
+                instruments: [{ method: "upi" }],
+              },
+            },
+            sequence: ["block.upi", "block.other"],
+            preferences: {
+              show_default_blocks: true,
+            },
+          },
+        },
       };
 
       const razorpay = new window.Razorpay(options);
