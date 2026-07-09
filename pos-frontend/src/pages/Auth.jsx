@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { FaUserTie, FaUserShield } from "react-icons/fa";
 import restaurant from "../assets/images/restaurant-img.jpg"
 import logo from "../assets/images/logo.png"
 import Register from "../components/auth/Register";
@@ -11,6 +12,16 @@ const Auth = () => {
   }, [])
 
   const [isRegister, setIsRegister] = useState(false);
+  // "employee" -> any account can sign in here (Waiter, Cashier, etc.)
+  // "admin"    -> only an account with role "Admin" is accepted
+  const [loginAs, setLoginAs] = useState("employee");
+
+  const isAdminTab = loginAs === "admin";
+
+  const switchTab = (tab) => {
+    setLoginAs(tab);
+    setIsRegister(false); // sign-up only makes sense on the Employee tab
+  };
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen w-full">
@@ -37,28 +48,60 @@ const Auth = () => {
           <h1 className="text-lg font-semibold text-[#f5f5f5] tracking-wide text-center">Satya 5-Star Hotel</h1>
         </div>
 
-        <h2 className="text-2xl sm:text-4xl text-center mt-10 font-semibold text-yellow-400 mb-10">
-          {isRegister ? "Employee Sign Up" : "Employee Login"}
+        {/* Employee / Admin tabs */}
+        <div className="flex mt-8 bg-[#1f1f1f] rounded-xl p-1 max-w-sm mx-auto">
+          <button
+            type="button"
+            onClick={() => switchTab("employee")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-all ${
+              !isAdminTab ? "bg-yellow-400 text-black" : "text-gray-400"
+            }`}
+          >
+            <FaUserTie />
+            Employee
+          </button>
+          <button
+            type="button"
+            onClick={() => switchTab("admin")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-all ${
+              isAdminTab ? "bg-yellow-400 text-black" : "text-gray-400"
+            }`}
+          >
+            <FaUserShield />
+            Admin
+          </button>
+        </div>
+
+        <h2 className="text-2xl sm:text-4xl text-center mt-8 font-semibold text-yellow-400 mb-10">
+          {isAdminTab ? "Admin Login" : isRegister ? "Employee Sign Up" : "Employee Login"}
         </h2>
 
         {/* Components */}
-        {isRegister ? (
+        {isAdminTab ? (
+          <Login requireRole="Admin" />
+        ) : isRegister ? (
           <Register setIsRegister={setIsRegister} isAdminCreating={false} />
         ) : (
           <Login />
         )}
 
-        <div className="flex justify-center mt-6">
-          <p className="text-sm text-[#ababab]">
-            {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
-            <button
-              onClick={() => setIsRegister(!isRegister)}
-              className="text-yellow-400 font-semibold hover:underline bg-transparent border-none cursor-pointer"
-            >
-              {isRegister ? "Sign in" : "Sign up"}
-            </button>
+        {isAdminTab ? (
+          <p className="text-sm text-[#ababab] text-center mt-6">
+            Admin accounts are created by another Admin, or via the setup script - there's no public sign-up for Admin access.
           </p>
-        </div>
+        ) : (
+          <div className="flex justify-center mt-6">
+            <p className="text-sm text-[#ababab]">
+              {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+              <button
+                onClick={() => setIsRegister(!isRegister)}
+                className="text-yellow-400 font-semibold hover:underline bg-transparent border-none cursor-pointer"
+              >
+                {isRegister ? "Sign in" : "Sign up"}
+              </button>
+            </p>
+          </div>
+        )}
 
 
       </div>

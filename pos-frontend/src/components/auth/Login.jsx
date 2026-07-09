@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query"
-import { login } from "../../https/index"
+import { login, logout } from "../../https/index"
 import { enqueueSnackbar } from "notistack";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
- 
-const Login = () => {
+
+// When requireRole="Admin" (the "Admin" tab on the Auth page), a
+// successful login is only accepted if the account's role is
+// actually Admin. Anything else is signed back out immediately and
+// shown an error, so the Admin tab can't be used as a backdoor into a
+// regular staff account.
+const Login = ({ requireRole } = {}) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const[formData, setFormData] = useState({
@@ -26,10 +31,26 @@ const Login = () => {
 
     const loginMutation = useMutation({
       mutationFn: (reqData) => login(reqData),
-      onSuccess: (res) => {
+      onSuccess: async (res) => {
           const { data } = res;
-          console.log(data);
           const { _id, name, email, phone, role } = data.data;
+
+          if (requireRole && role !== requireRole) {
+            // Wrong tab for this account - undo the login the server
+            // just performed instead of leaving them silently signed in.
+            localStorage.removeItem("accessToken");
+            try {
+              await logout();
+            } catch (e) {
+              // best-effort cleanup, ignore failures
+            }
+            enqueueSnackbar(
+              `This account isn't an ${requireRole}. Use Employee Login instead.`,
+              { variant: "error" }
+            );
+            return;
+          }
+
           if (data.accessToken) {
             localStorage.setItem("accessToken", data.accessToken);
           }
@@ -47,7 +68,7 @@ const Login = () => {
       <form onSubmit={handleSubmit}>
         <div>
           <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
-            Employee Email
+            {requireRole === "Admin" ? "Admin Email" : "Employee Email"}
           </label>
           <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
             <input
@@ -55,7 +76,7 @@ const Login = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter employee email"
+              placeholder={requireRole === "Admin" ? "Enter admin email" : "Enter employee email"}
               className="bg-transparent flex-1 text-white focus:outline-none"
               required
             />
