@@ -174,6 +174,7 @@ const Bill = () => {
       table: customerData.table.tableId,
       staff: customerData.staff.staffId,
       paymentMethod,
+      staff: customerData.staff?.id,
     };
 
     // ---------------- CASH ----------------

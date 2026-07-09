@@ -9,7 +9,7 @@ import { getStaff } from "../../https";
 import {
   setCustomer,
   updateTable,
-  setStaff,
+  setOrderStaff,
 } from "../../redux/slices/customerSlice";
 
 const CustomerModal = ({
@@ -25,17 +25,13 @@ const CustomerModal = ({
   const [guests, setGuests] = useState(1);
   const [staffId, setStaffId] = useState("");
 
-  const { data: staffData } = useQuery({
-    queryKey: ["staff-available"],
-    queryFn: async () => {
-      const response = await getStaff();
-      return response.data.data;
-    },
+  const { data: staffRes } = useQuery({
+    queryKey: ["staff-list", "active"],
+    queryFn: () => getStaff({ status: "Active" }),
+    enabled: isOpen,
   });
 
-  const availableStaff = (staffData || []).filter(
-    (member) => member.status === "Active"
-  );
+  const staffOptions = staffRes?.data?.data || [];
 
   const handleStartOrder = () => {
     if (!name.trim()) {
@@ -66,7 +62,7 @@ const CustomerModal = ({
       return;
     }
 
-    const selectedStaff = availableStaff.find((member) => member._id === staffId);
+    const selectedStaff = staffOptions.find((member) => member._id === staffId);
 
     dispatch(
       setCustomer({
@@ -86,11 +82,10 @@ const CustomerModal = ({
     );
 
     dispatch(
-      setStaff({
-        staff: {
-          staffId: selectedStaff._id,
-          name: selectedStaff.name,
-        },
+      setOrderStaff({
+        id: staffId,
+        name: selectedStaff?.name,
+        role: selectedStaff?.role,
       })
     );
 
@@ -161,18 +156,12 @@ const CustomerModal = ({
             className="w-full bg-[#262626] text-white rounded-lg px-4 py-3 outline-none"
           >
             <option value="">Select staff</option>
-            {availableStaff.map((member) => (
+            {staffOptions.map((member) => (
               <option key={member._id} value={member._id}>
-                {member.name} — {member.role}
+                {member.name} {member.role ? `(${member.role})` : ""}
               </option>
             ))}
           </select>
-
-          {availableStaff.length === 0 && (
-            <p className="text-xs text-yellow-500 mt-2">
-              No active staff found. Add staff members first.
-            </p>
-          )}
         </div>
 
         <button

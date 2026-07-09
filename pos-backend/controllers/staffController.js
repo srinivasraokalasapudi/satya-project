@@ -1,108 +1,60 @@
 const Staff = require("../models/Staff");
-const Order = require("../models/orderModel");
+const { startOfDay, startOfWeek, startOfMonth } = require("../utils/dateRanges");
 
-// Get Staff Report
-// For every staff member: how many orders they've taken (any status),
-// how much revenue those orders generated (Completed/paid orders only,
-// same convention as the dashboard + sales reports), and how much of
-// that revenue landed today.
-exports.getStaffReport = async (req, res, next) => {
-  try {
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+// Staff performance counters (totalOrders, totalRevenue, today/week/
+// month revenue) are updated incrementally by orderController when an
+// order is completed. The today/week/month buckets only get reset the
+// next time an order completes in a new period, so on read we correct
+// any bucket that's stale (belongs to a past day/week/month) back to
+// zero for display, without writing anything back to the database.
+const presentStaff = (staffDoc) => {
+  const now = new Date();
+  const todayStart = startOfDay(now);
+  const weekStart = startOfWeek(now);
+  const monthStart = startOfMonth(now);
 
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
+  const isSameDay =
+    staffDoc.todayDate &&
+    startOfDay(staffDoc.todayDate).getTime() === todayStart.getTime();
 
-    const staffList = await Staff.find().sort({ name: 1 }).lean();
+  const isSameWeek =
+    staffDoc.weekStartDate &&
+    new Date(staffDoc.weekStartDate).getTime() === weekStart.getTime();
 
-    const orderStats = await Order.aggregate([
-      {
-        $match: { staff: { $ne: null } },
-      },
-      {
-        $group: {
-          _id: "$staff",
-          totalOrders: { $sum: 1 },
-          totalRevenue: {
-            $sum: {
-              $cond: [
-                { $eq: ["$orderStatus", "Completed"] },
-                { $ifNull: ["$bills.totalWithTax", 0] },
-                0,
-              ],
-            },
-          },
-          todayRevenue: {
-            $sum: {
-              $cond: [
-                {
-                  $and: [
-                    { $eq: ["$orderStatus", "Completed"] },
-                    { $gte: ["$createdAt", todayStart] },
-                    { $lte: ["$createdAt", todayEnd] },
-                  ],
-                },
-                { $ifNull: ["$bills.totalWithTax", 0] },
-                0,
-              ],
-            },
-          },
-          todayOrders: {
-            $sum: {
-              $cond: [
-                {
-                  $and: [
-                    { $gte: ["$createdAt", todayStart] },
-                    { $lte: ["$createdAt", todayEnd] },
-                  ],
-                },
-                1,
-                0,
-              ],
-            },
-          },
-        },
-      },
-    ]);
+  const isSameMonth =
+    staffDoc.monthStartDate &&
+    new Date(staffDoc.monthStartDate).getTime() === monthStart.getTime();
 
-    const statsByStaffId = new Map(
-      orderStats.map((stat) => [String(stat._id), stat])
-    );
-
-    const data = staffList.map((member) => {
-      const stats = statsByStaffId.get(String(member._id)) || {};
-
-      return {
-        _id: member._id,
-        name: member.name,
-        role: member.role,
-        status: member.status,
-        totalOrders: stats.totalOrders || 0,
-        totalRevenue: stats.totalRevenue || 0,
-        todayOrders: stats.todayOrders || 0,
-        todayRevenue: stats.todayRevenue || 0,
-      };
-    });
-
-    res.json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    next(error);
-  }
+  return {
+    ...staffDoc,
+    todayRevenue: isSameDay ? staffDoc.todayRevenue || 0 : 0,
+    weeklyRevenue: isSameWeek ? staffDoc.weeklyRevenue || 0 : 0,
+    monthlyRevenue: isSameMonth ? staffDoc.monthlyRevenue || 0 : 0,
+    totalOrders: staffDoc.totalOrders || 0,
+    totalRevenue: staffDoc.totalRevenue || 0,
+  };
 };
 
 // Get All Staff
+// Supports ?status=Active to fetch only staff who are available to be
+// assigned to an order (used by the "select staff" picker on order
+// creation).
 exports.getStaff = async (req, res, next) => {
   try {
-    const staff = await Staff.find().sort({ createdAt: -1 });
+    const { status } = req.query;
+    const query = {};
+
+    if (status) {
+      query.status = status;
+    }
+
+    const staff = await Staff.find(query).sort({ createdAt: -1 }).lean();
+    const data = staff.map(presentStaff);
 
     res.json({
       success: true,
-      count: staff.length,
-      data: staff,
+      count: data.length,
+      data,
     });
   } catch (error) {
     next(error);
@@ -147,6 +99,26 @@ exports.updateStaff = async (req, res, next) => {
       success: true,
       message: "Staff updated successfully",
       data: employee,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Staff Reports
+// Returns, for every staff member: total orders taken, all-time
+// revenue, and today/this-week/this-month revenue — all read straight
+// off the Staff document's running counters (see updateStaffStats in
+// orderController), sorted by who's brought in the most revenue.
+exports.getStaffReports = async (req, res, next) => {
+  try {
+    const staffList = await Staff.find().sort({ totalRevenue: -1 }).lean();
+    const data = staffList.map(presentStaff);
+
+    res.json({
+      success: true,
+      count: data.length,
+      data,
     });
   } catch (error) {
     next(error);

@@ -34,13 +34,14 @@ const customerSlice = createSlice({
             state.table = action.payload.table;
         },
 
-        setStaff: (state, action) => {
-            state.staff = action.payload.staff;
+        setOrderStaff: (state, action) => {
+            // { id, name, role }
+            state.staff = action.payload;
         }
 
     }
 })
 
 
-export const { setCustomer, removeCustomer, updateTable, setStaff } = customerSlice.actions;
+export const { setCustomer, removeCustomer, updateTable, setOrderStaff } = customerSlice.actions;
 export default customerSlice.reducer;

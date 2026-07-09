@@ -87,8 +87,8 @@ export const deleteInventory = (id) =>
 // Staff APIs
 // =========================
 
-export const getStaff = () =>
-  axiosWrapper.get("/api/staff");
+export const getStaff = (params) =>
+  axiosWrapper.get("/api/staff", { params });
 
 export const addStaff = (data) =>
   axiosWrapper.post("/api/staff", data);
@@ -99,8 +99,8 @@ export const updateStaff = ({ id, ...data }) =>
 export const deleteStaff = (id) =>
   axiosWrapper.delete(`/api/staff/${id}`);
 
-export const getStaffReport = () =>
-  axiosWrapper.get("/api/staff/report");
+export const getStaffReports = () =>
+  axiosWrapper.get("/api/staff/reports");
 
 // =========================
 // Customer APIs
