@@ -134,6 +134,13 @@ const Bill = () => {
       return;
     }
 
+    if (!customerData.staff?.staffId) {
+      enqueueSnackbar("Please select the staff taking this order!", {
+        variant: "warning",
+      });
+      return;
+    }
+
     if (cartData.length === 0) {
       enqueueSnackbar("Cart is empty!", {
         variant: "warning",
@@ -165,6 +172,7 @@ const Bill = () => {
 
       items: cartData,
       table: customerData.table.tableId,
+      staff: customerData.staff.staffId,
       paymentMethod,
     };
 

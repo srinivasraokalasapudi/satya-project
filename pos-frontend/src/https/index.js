@@ -99,6 +99,9 @@ export const updateStaff = ({ id, ...data }) =>
 export const deleteStaff = (id) =>
   axiosWrapper.delete(`/api/staff/${id}`);
 
+export const getStaffReport = () =>
+  axiosWrapper.get("/api/staff/report");
+
 // =========================
 // Customer APIs
 // =========================

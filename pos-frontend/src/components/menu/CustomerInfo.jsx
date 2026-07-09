@@ -18,6 +18,11 @@ const CustomerInfo = () => {
         <p className="text-xs text-[#ababab] font-medium mt-2">
           {formatDate(dateTime)}
         </p>
+        {customerData.staff?.name && (
+          <p className="text-xs text-[#ababab] font-medium mt-1">
+            Staff : {customerData.staff.name}
+          </p>
+        )}
       </div>
       <button className="bg-[#f6b100] p-3 text-xl font-bold rounded-lg">
         {getAvatarName(customerData.customerName) || "CN"}

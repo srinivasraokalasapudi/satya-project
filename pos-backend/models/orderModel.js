@@ -5,7 +5,13 @@ const orderSchema = new mongoose.Schema(
     customer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Customer"
-},  
+},
+
+    staff: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff",
+    },
+
     customerDetails: {
       name: {
         type: String,
