@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
 import { enqueueSnackbar } from "notistack";
 import { satya as addOrderRedux } from "../../redux/slices/orderSlice";
 
@@ -22,13 +21,8 @@ import {
 import Invoice from "../invoice/Invoice";
 import ConfirmDialog from "../shared/ConfirmDialog";
 import { FaWhatsapp } from "react-icons/fa";
-import { MdOutlineQrCode2, MdOutlineClose } from "react-icons/md";
-import {
-  getWhatsAppReceiptUrl,
-  buildUpiPaymentUrl,
-  getUpiQrCodeUrl,
-  isUpiDemoVpa,
-} from "../../utils";
+import { MdOutlineQrCode2 } from "react-icons/md";
+import { getWhatsAppReceiptUrl } from "../../utils";
 
 function loadScript(src) {
   return new Promise((resolve) => {
@@ -57,8 +51,6 @@ const Bill = () => {
   const [showInvoice, setShowInvoice] = useState(false);
   const [orderInfo, setOrderInfo] = useState(null);
   const [showWhatsAppPrompt, setShowWhatsAppPrompt] = useState(false);
-  const [showUpiModal, setShowUpiModal] = useState(false);
-  const [pendingUpiOrderData, setPendingUpiOrderData] = useState(null);
 
   // ---------------- STAFF ----------------
 
@@ -221,18 +213,25 @@ const Bill = () => {
       return;
     }
 
-    // ---------------- UPI ----------------
-    // UPI is settled directly between the customer's UPI app and the
-    // merchant VPA (no gateway round-trip like Razorpay), so we show a
-    // QR/deep-link modal and let the waiter confirm once payment lands.
-    if (paymentMethod === "UPI") {
-      setPendingUpiOrderData(orderData);
-      setShowUpiModal(true);
+    // ---------------- UPI / ONLINE ----------------
+    // Both go through Razorpay (not a raw upi://pay deep link straight to
+    // the merchant VPA). A direct-to-VPA link settles peer-to-peer between
+    // the customer's UPI app and the bank - our server/Razorpay never
+    // hears about it, so nothing could ever auto-confirm it, no matter
+    // what the frontend does. Routing through Razorpay's checkout means
+    // Razorpay's SDK detects the payment itself (polling + the UPI app's
+    // return) and fires `handler` the moment it's captured, which then
+    // verifies the payment and places the order automatically - no
+    // "Payment Received" button needed.
+    if (paymentMethod === "UPI" || paymentMethod === "Online") {
+      await openRazorpayCheckout(orderData, {
+        upiOnly: paymentMethod === "UPI",
+      });
       return;
     }
+  };
 
-    // ---------------- ONLINE ----------------
-
+  const openRazorpayCheckout = async (orderData, { upiOnly }) => {
     try {
       const loaded = await loadScript(
         "https://checkout.razorpay.com/v1/checkout.js"
@@ -262,13 +261,16 @@ const Bill = () => {
 
         description: "Restaurant POS Payment",
 
+        // Fires the instant Razorpay confirms the payment (including a
+        // scanned UPI QR / intent payment) - this is what makes the order
+        // get placed automatically, with no manual confirmation step.
         handler: async (response) => {
           try {
             await verifyPaymentRazorpay({
               ...response,
               amount: totalPriceWithTax.toFixed(2),
               currency: data.order.currency,
-              method: "Online",
+              method: upiOnly ? "UPI" : "Online",
               email: customerData.customerEmail,
               contact: customerData.customerPhone,
             });
@@ -298,8 +300,10 @@ const Bill = () => {
         // the merchant's dashboard, in whatever order it decides. That's
         // why UPI can silently disappear from "Payment Options" even
         // though it's a standard method - explicitly pinning a UPI block
-        // here forces it to render alongside the default blocks instead
-        // of relying on dashboard config/ordering.
+        // here forces it to render. When the waiter picked the "UPI"
+        // button specifically, we restrict the checkout to just the UPI
+        // block (QR/collect/intent) so it opens straight to the QR
+        // screen instead of the full payment-method list.
         config: {
           display: {
             blocks: {
@@ -308,15 +312,23 @@ const Bill = () => {
                 instruments: [{ method: "upi" }],
               },
             },
-            sequence: ["block.upi", "block.other"],
+            sequence: upiOnly ? ["block.upi"] : ["block.upi", "block.other"],
             preferences: {
-              show_default_blocks: true,
+              show_default_blocks: !upiOnly,
             },
           },
         },
       };
 
       const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", (response) => {
+        console.log(response.error);
+        enqueueSnackbar(
+          response.error?.description || "Payment failed!",
+          { variant: "error" }
+        );
+      });
 
       razorpay.open();
     } catch (error) {
@@ -354,31 +366,6 @@ const Bill = () => {
 
   const handleDeclineSendWhatsApp = () => {
     setShowWhatsAppPrompt(false);
-  };
-
-  // ---------------- UPI PAYMENT ----------------
-
-  const upiPaymentUrl = buildUpiPaymentUrl({
-    amount: totalPriceWithTax,
-    note: `Table ${customerData.table?.tableNo ?? ""} - Satya 5-Star Hotel`,
-    refId: customerData.orderId,
-  });
-
-  const upiQrCodeUrl = getUpiQrCodeUrl(upiPaymentUrl);
-
-  const handleCancelUpi = () => {
-    setShowUpiModal(false);
-    setPendingUpiOrderData(null);
-  };
-
-  // Waiter taps this once the customer's UPI app shows the payment as
-  // successful (there's no gateway webhook for a direct VPA payment).
-  const handleConfirmUpiReceived = () => {
-    if (!pendingUpiOrderData) return;
-
-    orderMutation.mutate(pendingUpiOrderData);
-    setShowUpiModal(false);
-    setPendingUpiOrderData(null);
   };
 
   return (
@@ -509,94 +496,6 @@ const Bill = () => {
         onCancel={handleDeclineSendWhatsApp}
       />
 
-      <AnimatePresence>
-        {showUpiModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center p-4 z-[60]"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 10 }}
-              transition={{ duration: 0.2 }}
-              className="bg-[#1a1a1a] rounded-xl shadow-lg w-full max-w-sm p-6 text-center relative"
-            >
-              <button
-                onClick={handleCancelUpi}
-                className="absolute top-3 right-3 text-[#ababab] hover:text-white"
-              >
-                <MdOutlineClose size={22} />
-              </button>
-
-              <h3 className="text-white text-lg font-semibold">
-                Scan to Pay with UPI
-              </h3>
-
-              <p className="text-[#ababab] text-sm mt-1">
-                GPay, PhonePe, Paytm or any UPI app
-              </p>
-
-              {isUpiDemoVpa && (
-                <div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs rounded-lg px-3 py-2 mt-3 text-left">
-                  This QR uses a placeholder UPI ID and will show "Invalid
-                  QR code" when scanned. Set{" "}
-                  <span className="font-mono">VITE_UPI_ID</span> to your
-                  real business UPI ID in the deployment's environment
-                  variables to make this scannable.
-                </div>
-              )}
-
-              <div className="bg-white rounded-lg p-3 mx-auto mt-4 w-fit">
-                <img
-                  src={upiQrCodeUrl}
-                  alt="UPI QR Code"
-                  width={220}
-                  height={220}
-                  className="block"
-                />
-              </div>
-
-              <div className="text-[#f6b100] text-2xl font-bold mt-4">
-                ₹{totalPriceWithTax.toFixed(2)}
-              </div>
-
-              <a
-                href={upiPaymentUrl}
-                className="block mt-4 bg-[#2a2a2a] text-white rounded-lg py-2.5 font-semibold text-sm hover:bg-[#333]"
-              >
-                Open in UPI App
-              </a>
-
-              <p className="text-[#7a7a7a] text-xs mt-3">
-                Once the customer completes the payment, confirm below to
-                place the order.
-              </p>
-
-              <div className="flex gap-3 mt-4">
-                <button
-                  onClick={handleCancelUpi}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#2a2a2a] text-[#ababab] hover:bg-[#333]"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={handleConfirmUpiReceived}
-                  disabled={orderMutation.isPending}
-                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-green-600 text-white hover:bg-green-700"
-                >
-                  {orderMutation.isPending
-                    ? "Placing..."
-                    : "Payment Received"}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };
