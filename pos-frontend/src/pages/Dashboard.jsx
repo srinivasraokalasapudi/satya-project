@@ -104,33 +104,77 @@ const Dashboard = () => {
       )}
 
       {activeTab === "Payments" && (
-        <div className="container mx-auto px-6 pb-8">
-          <div className="bg-[#262626] rounded-2xl p-6 border border-gray-700">
-            <h2 className="text-2xl font-semibold text-white mb-6">
+        <div className="container mx-auto px-4 sm:px-6 pb-8">
+          <div className="bg-[#262626] rounded-2xl p-4 sm:p-6 border border-gray-700">
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6">
               Recent Transactions
             </h2>
 
             {data?.recentTransactions?.length ? (
-              <table className="w-full">
-                <thead>
-                  <tr className="text-gray-400 border-b border-gray-700">
-                    <th className="text-left py-3">Payment ID</th>
-                    <th className="text-left">Amount</th>
-                    <th className="text-left">Method</th>
-                    <th className="text-left">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <>
+                {/* Mobile: stacked cards */}
+                <div className="flex flex-col gap-3 sm:hidden">
                   {data.recentTransactions.map((payment) => (
-                    <tr key={payment._id} className="border-b border-gray-800">
-                      <td className="py-4 text-white">{payment.paymentId}</td>
-                      <td className="text-yellow-400">₹{payment.amount}</td>
-                      <td className="text-gray-300">{payment.method}</td>
-                      <td className="text-green-400">{payment.status}</td>
-                    </tr>
+                    <div
+                      key={payment._id}
+                      className="bg-[#1f1f1f] rounded-xl p-4 border border-gray-800"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-yellow-400 font-semibold text-lg">
+                          ₹{payment.amount}
+                        </span>
+                        <span className="text-green-400 text-sm font-medium">
+                          {payment.status}
+                        </span>
+                      </div>
+                      <div
+                        className="text-white text-sm truncate"
+                        title={payment.paymentId}
+                      >
+                        {payment.paymentId}
+                      </div>
+                      <div className="text-gray-400 text-sm mt-1">
+                        {payment.method}
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+
+                {/* Tablet/Desktop: table */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full min-w-[500px]">
+                    <thead>
+                      <tr className="text-gray-400 border-b border-gray-700">
+                        <th className="text-left py-3">Payment ID</th>
+                        <th className="text-left">Amount</th>
+                        <th className="text-left">Method</th>
+                        <th className="text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.recentTransactions.map((payment) => (
+                        <tr key={payment._id} className="border-b border-gray-800">
+                          <td
+                            className="py-4 text-white max-w-[180px] truncate"
+                            title={payment.paymentId}
+                          >
+                            {payment.paymentId}
+                          </td>
+                          <td className="text-yellow-400 whitespace-nowrap">
+                            ₹{payment.amount}
+                          </td>
+                          <td className="text-gray-300 whitespace-nowrap">
+                            {payment.method}
+                          </td>
+                          <td className="text-green-400 whitespace-nowrap">
+                            {payment.status}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             ) : (
               <div className="text-gray-400">
                 No payment history available.
