@@ -12,11 +12,10 @@ import Metrics from "../components/dashboard/Metrics";
 import RecentOrders from "../components/dashboard/RecentOrders";
 import FullScreenLoader from "../components/shared/FullScreenLoader";
 import StaffManagement from "./Management/StaffManagement";
-import CustomerManagement from "./Management/CustomerManagement";
 
 import { getDashboardStats } from "../https/dashboard";
 
-const tabs = ["Metrics", "Orders", "Payments", "Staff", "Customers"];
+const tabs = ["Metrics", "Orders", "Payments", "Staff"];
 
 const Dashboard = () => {
   useEffect(() => {
@@ -141,7 +140,6 @@ const Dashboard = () => {
         </div>
       )}
       {activeTab === "Staff" && <StaffManagement />}
-      {activeTab === "Customers" && <CustomerManagement />}
     </div>
   );
 };
