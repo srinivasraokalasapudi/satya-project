@@ -114,29 +114,50 @@ export const getWhatsAppReceiptUrl = (order) => {
 // =========================
 
 // Merchant VPA/name are configurable via env so each deployment can point
-// at its own UPI ID without a code change; fall back to sensible demo
-// values so the flow still works out of the box.
-const UPI_PAYEE_VPA = import.meta.env.VITE_UPI_ID || "satya5starhotel@okhdfcbank";
+// at its own UPI ID without a code change. The fallback below is NOT a
+// real, payable UPI ID — it's just enough to keep the flow from crashing
+// before a real VPA is configured. Every UPI app validates the payee VPA
+// against NPCI before accepting a scan, so a QR built from this fallback
+// will always be rejected ("Invalid QR code") until VITE_UPI_ID is set to
+// a real registered UPI ID.
+const DEMO_UPI_VPA = "satya5starhotel@okhdfcbank";
+const UPI_PAYEE_VPA = import.meta.env.VITE_UPI_ID || DEMO_UPI_VPA;
 const UPI_PAYEE_NAME = import.meta.env.VITE_UPI_PAYEE_NAME || "Satya 5-Star Hotel";
+
+// True whenever VITE_UPI_ID hasn't been set to a real business UPI ID, so
+// the UI can warn the waiter instead of handing out a QR that will never
+// scan successfully.
+export const isUpiDemoVpa = UPI_PAYEE_VPA === DEMO_UPI_VPA;
 
 // Builds a standard UPI deep link (upi://pay) that any UPI app (GPay,
 // PhonePe, Paytm, BHIM, etc.) can open directly to pre-fill the payment.
+//
+// IMPORTANT: this must be strict percent-encoding (spaces as %20), not
+// URLSearchParams's form-encoding (spaces as "+"). UPI apps parse this as
+// a URI, not a submitted form, and several of them reject a "+"-encoded
+// query as malformed, surfacing as "Invalid QR code" on scan even though
+// the payee VPA itself is valid.
 export const buildUpiPaymentUrl = ({ amount, note, refId }) => {
-  const params = new URLSearchParams({
-    pa: UPI_PAYEE_VPA, // payee VPA
-    pn: UPI_PAYEE_NAME, // payee name
-    am: Number(amount).toFixed(2), // amount
-    cu: "INR",
-  });
+  const params = [
+    ["pa", UPI_PAYEE_VPA], // payee VPA
+    ["pn", UPI_PAYEE_NAME], // payee name
+    ["am", Number(amount).toFixed(2)], // amount
+    ["cu", "INR"],
+  ];
 
-  if (note) params.set("tn", note);
-  if (refId) params.set("tr", String(refId));
+  if (note) params.push(["tn", note]);
+  if (refId) params.push(["tr", String(refId)]);
 
-  return `upi://pay?${params.toString()}`;
+  const query = params
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+
+  return `upi://pay?${query}`;
 };
 
 // Renders the UPI link as a scannable QR code image via a public QR
 // generator, so customers without the deep-link handoff (e.g. scanning
+
 // from a POS screen) can still pay.
 export const getUpiQrCodeUrl = (upiUrl, size = 260) => {
   return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(

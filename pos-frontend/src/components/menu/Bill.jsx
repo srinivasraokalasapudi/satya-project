@@ -27,6 +27,7 @@ import {
   getWhatsAppReceiptUrl,
   buildUpiPaymentUrl,
   getUpiQrCodeUrl,
+  isUpiDemoVpa,
 } from "../../utils";
 
 function loadScript(src) {
@@ -516,6 +517,16 @@ const Bill = () => {
               <p className="text-[#ababab] text-sm mt-1">
                 GPay, PhonePe, Paytm or any UPI app
               </p>
+
+              {isUpiDemoVpa && (
+                <div className="bg-red-500/10 border border-red-500/40 text-red-400 text-xs rounded-lg px-3 py-2 mt-3 text-left">
+                  This QR uses a placeholder UPI ID and will show "Invalid
+                  QR code" when scanned. Set{" "}
+                  <span className="font-mono">VITE_UPI_ID</span> to your
+                  real business UPI ID in the deployment's environment
+                  variables to make this scannable.
+                </div>
+              )}
 
               <div className="bg-white rounded-lg p-3 mx-auto mt-4 w-fit">
                 <img
