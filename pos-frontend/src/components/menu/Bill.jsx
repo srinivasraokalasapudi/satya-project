@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
 import { satya as addOrderRedux } from "../../redux/slices/orderSlice";
 
@@ -8,13 +8,14 @@ import {
   getTotalPrice,
   removeAllItems,
 } from "../../redux/slices/cartSlice";
-import { removeCustomer } from "../../redux/slices/customerSlice";
+import { removeCustomer, setOrderStaff } from "../../redux/slices/customerSlice";
 
 import {
   addOrder,
   createOrderRazorpay,
   verifyPaymentRazorpay,
   updateTable,
+  getStaff,
 } from "../../https";
 
 import Invoice from "../invoice/Invoice";
@@ -49,6 +50,33 @@ const Bill = () => {
   const [showInvoice, setShowInvoice] = useState(false);
   const [orderInfo, setOrderInfo] = useState(null);
   const [showWhatsAppPrompt, setShowWhatsAppPrompt] = useState(false);
+
+  // ---------------- STAFF ----------------
+
+  const { data: staffRes } = useQuery({
+    queryKey: ["staff-list", "active"],
+    queryFn: () => getStaff({ status: "Active" }),
+  });
+
+  const staffOptions = staffRes?.data?.data || [];
+
+  const handleSelectStaff = (e) => {
+    const staffId = e.target.value;
+
+    if (!staffId) return;
+
+    const selected = staffOptions.find((member) => member._id === staffId);
+
+    if (!selected) return;
+
+    dispatch(
+      setOrderStaff({
+        id: selected._id,
+        name: selected.name,
+        role: selected.role,
+      })
+    );
+  };
 
   // ---------------- TABLE UPDATE ----------------
 
@@ -134,7 +162,7 @@ const Bill = () => {
       return;
     }
 
-    if (!customerData.staff?.staffId) {
+    if (!customerData.staff?.id) {
       enqueueSnackbar("Please select the staff taking this order!", {
         variant: "warning",
       });
@@ -172,9 +200,8 @@ const Bill = () => {
 
       items: cartData,
       table: customerData.table.tableId,
-      staff: customerData.staff.staffId,
-      paymentMethod,
       staff: customerData.staff?.id,
+      paymentMethod,
     };
 
     // ---------------- CASH ----------------
@@ -285,6 +312,26 @@ const Bill = () => {
   return (
     <>
       <div className="sticky bottom-0 bg-[#1a1a1a] border-t border-[#2a2a2a] px-5 py-4">
+        <div className="mb-4">
+          <label className="text-[#ababab] text-sm mb-1 block">
+            Staff taking this order
+          </label>
+
+          <select
+            value={customerData.staff?.id || ""}
+            onChange={handleSelectStaff}
+            className="w-full bg-[#2a2a2a] text-white rounded-lg px-3 py-2 outline-none"
+          >
+            <option value="">Select staff</option>
+
+            {staffOptions.map((member) => (
+              <option key={member._id} value={member._id}>
+                {member.name} ({member.role})
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="space-y-3">
           <div className="flex justify-between">
             <span className="text-[#ababab]">
