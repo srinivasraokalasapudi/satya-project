@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { AnimatePresence, motion } from "framer-motion";
 import { enqueueSnackbar } from "notistack";
 import { satya as addOrderRedux } from "../../redux/slices/orderSlice";
 
@@ -21,7 +22,12 @@ import {
 import Invoice from "../invoice/Invoice";
 import ConfirmDialog from "../shared/ConfirmDialog";
 import { FaWhatsapp } from "react-icons/fa";
-import { getWhatsAppReceiptUrl } from "../../utils";
+import { MdOutlineQrCode2, MdOutlineClose } from "react-icons/md";
+import {
+  getWhatsAppReceiptUrl,
+  buildUpiPaymentUrl,
+  getUpiQrCodeUrl,
+} from "../../utils";
 
 function loadScript(src) {
   return new Promise((resolve) => {
@@ -50,6 +56,8 @@ const Bill = () => {
   const [showInvoice, setShowInvoice] = useState(false);
   const [orderInfo, setOrderInfo] = useState(null);
   const [showWhatsAppPrompt, setShowWhatsAppPrompt] = useState(false);
+  const [showUpiModal, setShowUpiModal] = useState(false);
+  const [pendingUpiOrderData, setPendingUpiOrderData] = useState(null);
 
   // ---------------- STAFF ----------------
 
@@ -212,6 +220,16 @@ const Bill = () => {
       return;
     }
 
+    // ---------------- UPI ----------------
+    // UPI is settled directly between the customer's UPI app and the
+    // merchant VPA (no gateway round-trip like Razorpay), so we show a
+    // QR/deep-link modal and let the waiter confirm once payment lands.
+    if (paymentMethod === "UPI") {
+      setPendingUpiOrderData(orderData);
+      setShowUpiModal(true);
+      return;
+    }
+
     // ---------------- ONLINE ----------------
 
     try {
@@ -316,6 +334,31 @@ const Bill = () => {
     setShowWhatsAppPrompt(false);
   };
 
+  // ---------------- UPI PAYMENT ----------------
+
+  const upiPaymentUrl = buildUpiPaymentUrl({
+    amount: totalPriceWithTax,
+    note: `Table ${customerData.table?.tableNo ?? ""} - Satya 5-Star Hotel`,
+    refId: customerData.orderId,
+  });
+
+  const upiQrCodeUrl = getUpiQrCodeUrl(upiPaymentUrl);
+
+  const handleCancelUpi = () => {
+    setShowUpiModal(false);
+    setPendingUpiOrderData(null);
+  };
+
+  // Waiter taps this once the customer's UPI app shows the payment as
+  // successful (there's no gateway webhook for a direct VPA payment).
+  const handleConfirmUpiReceived = () => {
+    if (!pendingUpiOrderData) return;
+
+    orderMutation.mutate(pendingUpiOrderData);
+    setShowUpiModal(false);
+    setPendingUpiOrderData(null);
+  };
+
   return (
     <>
       <div className="sticky bottom-0 bg-[#1a1a1a] border-t border-[#2a2a2a] px-5 py-4">
@@ -371,7 +414,7 @@ const Bill = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mt-5">
+        <div className="grid grid-cols-3 gap-3 mt-5">
           <button
             onClick={() => setPaymentMethod("Cash")}
             className={`rounded-lg py-3 font-semibold ${
@@ -381,6 +424,18 @@ const Bill = () => {
             }`}
           >
             Cash
+          </button>
+
+          <button
+            onClick={() => setPaymentMethod("UPI")}
+            className={`rounded-lg py-3 font-semibold flex items-center justify-center gap-1.5 ${
+              paymentMethod === "UPI"
+                ? "bg-[#025cca] text-white"
+                : "bg-[#2a2a2a] text-[#ababab]"
+            }`}
+          >
+            <MdOutlineQrCode2 size={18} />
+            UPI
           </button>
 
           <button
@@ -431,6 +486,85 @@ const Bill = () => {
         onConfirm={handleConfirmSendWhatsApp}
         onCancel={handleDeclineSendWhatsApp}
       />
+
+      <AnimatePresence>
+        {showUpiModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center p-4 z-[60]"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="bg-[#1a1a1a] rounded-xl shadow-lg w-full max-w-sm p-6 text-center relative"
+            >
+              <button
+                onClick={handleCancelUpi}
+                className="absolute top-3 right-3 text-[#ababab] hover:text-white"
+              >
+                <MdOutlineClose size={22} />
+              </button>
+
+              <h3 className="text-white text-lg font-semibold">
+                Scan to Pay with UPI
+              </h3>
+
+              <p className="text-[#ababab] text-sm mt-1">
+                GPay, PhonePe, Paytm or any UPI app
+              </p>
+
+              <div className="bg-white rounded-lg p-3 mx-auto mt-4 w-fit">
+                <img
+                  src={upiQrCodeUrl}
+                  alt="UPI QR Code"
+                  width={220}
+                  height={220}
+                  className="block"
+                />
+              </div>
+
+              <div className="text-[#f6b100] text-2xl font-bold mt-4">
+                ₹{totalPriceWithTax.toFixed(2)}
+              </div>
+
+              <a
+                href={upiPaymentUrl}
+                className="block mt-4 bg-[#2a2a2a] text-white rounded-lg py-2.5 font-semibold text-sm hover:bg-[#333]"
+              >
+                Open in UPI App
+              </a>
+
+              <p className="text-[#7a7a7a] text-xs mt-3">
+                Once the customer completes the payment, confirm below to
+                place the order.
+              </p>
+
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={handleCancelUpi}
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-[#2a2a2a] text-[#ababab] hover:bg-[#333]"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleConfirmUpiReceived}
+                  disabled={orderMutation.isPending}
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-green-600 text-white hover:bg-green-700"
+                >
+                  {orderMutation.isPending
+                    ? "Placing..."
+                    : "Payment Received"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };

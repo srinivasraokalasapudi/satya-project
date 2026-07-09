@@ -108,3 +108,38 @@ export const getWhatsAppReceiptUrl = (order) => {
   const message = buildReceiptMessage(order);
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 };
+
+// =========================
+// UPI Payment
+// =========================
+
+// Merchant VPA/name are configurable via env so each deployment can point
+// at its own UPI ID without a code change; fall back to sensible demo
+// values so the flow still works out of the box.
+const UPI_PAYEE_VPA = import.meta.env.VITE_UPI_ID || "satya5starhotel@okhdfcbank";
+const UPI_PAYEE_NAME = import.meta.env.VITE_UPI_PAYEE_NAME || "Satya 5-Star Hotel";
+
+// Builds a standard UPI deep link (upi://pay) that any UPI app (GPay,
+// PhonePe, Paytm, BHIM, etc.) can open directly to pre-fill the payment.
+export const buildUpiPaymentUrl = ({ amount, note, refId }) => {
+  const params = new URLSearchParams({
+    pa: UPI_PAYEE_VPA, // payee VPA
+    pn: UPI_PAYEE_NAME, // payee name
+    am: Number(amount).toFixed(2), // amount
+    cu: "INR",
+  });
+
+  if (note) params.set("tn", note);
+  if (refId) params.set("tr", String(refId));
+
+  return `upi://pay?${params.toString()}`;
+};
+
+// Renders the UPI link as a scannable QR code image via a public QR
+// generator, so customers without the deep-link handoff (e.g. scanning
+// from a POS screen) can still pay.
+export const getUpiQrCodeUrl = (upiUrl, size = 260) => {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(
+    upiUrl
+  )}`;
+};
