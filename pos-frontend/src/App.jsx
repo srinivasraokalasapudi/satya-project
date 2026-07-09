@@ -29,6 +29,7 @@ import { useSelector } from "react-redux";
 import useLoadData from "./hooks/useLoadData";
 import FullScreenLoader from "./components/shared/FullScreenLoader";
 import { enqueueSnackbar } from "notistack";
+import CustomerApp from "./pages/customer/CustomerApp";
 
 function Layout() {
   const isLoading = useLoadData();
@@ -224,7 +225,17 @@ function ProtectedRoutes({ children, adminOnly = false }) {
 function App() {
   return (
     <Router>
-      <Layout />
+      <Routes>
+        {/*
+          Customer self-service ordering (QR code at the table). This
+          lives completely outside Layout/useLoadData/ProtectedRoutes
+          on purpose - those all assume a logged-in staff member, and
+          would otherwise redirect a diner straight to /auth.
+        */}
+        <Route path="/order/*" element={<CustomerApp />} />
+
+        <Route path="/*" element={<Layout />} />
+      </Routes>
     </Router>
   );
 }

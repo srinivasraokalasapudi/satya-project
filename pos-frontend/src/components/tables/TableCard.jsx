@@ -12,7 +12,13 @@ const TableCard = ({
   seats,
   onClick,
   refetchTables,
+  onShowQr,
 }) => {
+
+  const handleShowQr = (e) => {
+    e.stopPropagation();
+    if (onShowQr) onShowQr({ id, name });
+  };
 
   const handleReset = async (e) => {
     e.stopPropagation();
@@ -59,15 +65,25 @@ const TableCard = ({
           {name}
         </h1>
 
-        <span
-          className={`px-3 py-1 rounded-lg text-sm font-medium ${
-            status === "Booked"
-              ? "bg-green-700 text-white"
-              : "bg-yellow-700 text-white"
-          }`}
-        >
-          {status}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className={`px-3 py-1 rounded-lg text-sm font-medium ${
+              status === "Booked"
+                ? "bg-green-700 text-white"
+                : "bg-yellow-700 text-white"
+            }`}
+          >
+            {status}
+          </span>
+
+          <button
+            onClick={handleShowQr}
+            title="Get order QR code for this table"
+            className="px-2 py-1 rounded-lg text-xs font-semibold bg-[#383838] text-[#f6b100]"
+          >
+            QR
+          </button>
+        </div>
       </div>
 
       <div className="flex justify-center my-8">

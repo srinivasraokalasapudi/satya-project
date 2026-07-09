@@ -86,7 +86,7 @@ const ProfileCard = ({ userName, userRole }) => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
-          <InfoStat label="Logged in as" value={userName || "Administrator"} sub={userRole || "Admin"} />
+          <InfoStat label="Logged in as" value={userName || "Administrator"} />
           <InfoStat label="Current Shift" value={getShift()} />
           <InfoStat label="Today" value={today} small />
           <div className="flex flex-col justify-center">

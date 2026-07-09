@@ -86,6 +86,9 @@ app.use("/api/payment", require("./routes/paymentRoute"));
 // Customers
 app.use("/api/customer", require("./routes/customerRoute"));
 
+// Customer self-service auth (sign up / login to order for yourself)
+app.use("/api/customer-auth", require("./routes/customerAuthRoute"));
+
 // Dashboard
 app.use("/api/dashboard", require("./routes/dashboardRoute"));
 

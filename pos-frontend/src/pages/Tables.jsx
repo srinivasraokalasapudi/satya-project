@@ -21,6 +21,9 @@ const Tables = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTable, setSelectedTable] = useState(null);
 
+  // Order-QR Modal State
+  const [qrTable, setQrTable] = useState(null);
+
   useEffect(() => {
     document.title = "POS | Tables";
   }, []);
@@ -149,6 +152,7 @@ const Tables = () => {
               seats={table.seats}
               onClick={() => handleTableClick(table)}
               refetchTables={() => window.location.reload()}
+              onShowQr={setQrTable}
             />
           ))}
 
@@ -169,6 +173,47 @@ const Tables = () => {
         onClose={() => setIsModalOpen(false)}
         selectedTable={selectedTable}
       />
+
+      {/* Order QR Modal */}
+      {qrTable && (
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-6"
+          onClick={() => setQrTable(null)}
+        >
+          <div
+            className="bg-[#262626] rounded-xl p-6 max-w-xs w-full text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-white text-lg font-bold mb-1">
+              Table {qrTable.name}
+            </h2>
+            <p className="text-[#ababab] text-sm mb-4">
+              Customers scan this to order from their phone
+            </p>
+
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+                `${window.location.origin}/order/${qrTable.id}`
+              )}`}
+              alt={`QR code to order at table ${qrTable.name}`}
+              className="mx-auto rounded-lg bg-white p-2"
+              width={220}
+              height={220}
+            />
+
+            <p className="text-[#ababab] text-xs mt-4 break-all">
+              {`${window.location.origin}/order/${qrTable.id}`}
+            </p>
+
+            <button
+              onClick={() => setQrTable(null)}
+              className="w-full mt-5 py-2 rounded-lg bg-[#383838] text-white font-semibold"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <BottomNav />
     </section>

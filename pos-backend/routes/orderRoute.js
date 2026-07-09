@@ -6,9 +6,11 @@ const {
   getOrders,
   updateOrder,
   deleteOrder,
+  createSelfOrder,
+  getMyOrders,
 } = require("../controllers/orderController");
 
-const { isVerifiedUser } = require("../middlewares/tokenVerification");
+const { isVerifiedUser, isVerifiedCustomer } = require("../middlewares/tokenVerification");
 const { isAdmin } = require("../middlewares/roleVerification");
 
 const router = express.Router();
@@ -17,6 +19,12 @@ const router = express.Router();
 // so any logged-in employee can do this - not just Admins.
 router.post("/", isVerifiedUser, addOrder);
 router.get("/", isVerifiedUser, getOrders);
+
+// Self-service (diner logged in via QR code at their table). Declared
+// before "/:id" so "mine"/"self" are never swallowed as an order id.
+router.post("/self", isVerifiedCustomer, createSelfOrder);
+router.get("/mine", isVerifiedCustomer, getMyOrders);
+
 router.get("/:id", isVerifiedUser, getOrderById);
 router.put("/:id", isVerifiedUser, updateOrder);
 // Deleting an order record entirely is destructive, so that stays Admin-only.

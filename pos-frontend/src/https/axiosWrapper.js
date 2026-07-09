@@ -17,7 +17,15 @@ export const axiosWrapper = axios.create({
 // also send the token explicitly via the Authorization header whenever
 // we have one stored locally.
 axiosWrapper.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const isCustomerSelfServiceRoute =
+    config.url?.startsWith("/api/customer-auth") ||
+    config.url?.startsWith("/api/order/self") ||
+    config.url?.startsWith("/api/order/mine");
+
+  const token = isCustomerSelfServiceRoute
+    ? localStorage.getItem("customerAccessToken")
+    : localStorage.getItem("accessToken");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

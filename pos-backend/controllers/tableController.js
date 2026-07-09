@@ -51,6 +51,32 @@ const getTables = async (req, res, next) => {
   }
 };
 
+// Public lookup - used by the QR-code landing page to show "Table 4"
+// before the diner has logged in, so no auth is required here. Only
+// non-sensitive fields are returned.
+const getTableById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return next(createHttpError(404, "Table not found!"));
+    }
+
+    const table = await Table.findById(id).select("tableNo seats status");
+
+    if (!table) {
+      return next(createHttpError(404, "Table not found!"));
+    }
+
+    res.status(200).json({
+      success: true,
+      data: table,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const updateTable = async (req, res, next) => {
   try {
     const { status, orderId } = req.body;
@@ -121,6 +147,7 @@ const resetTable = async (req, res, next) => {
 module.exports = {
   addTable,
   getTables,
+  getTableById,
   updateTable,
   resetTable,
 };

@@ -125,3 +125,28 @@ export const getSettings = () =>
 
 export const updateSettings = (data) =>
   axiosWrapper.put("/api/settings", data);
+
+// =========================
+// Customer Self-Service APIs (QR-code ordering)
+// =========================
+
+export const getTablePublic = (tableId) =>
+  axiosWrapper.get(`/api/table/public/${tableId}`);
+
+export const registerCustomerSelf = (data) =>
+  axiosWrapper.post("/api/customer-auth/register", data);
+
+export const loginCustomerSelf = (data) =>
+  axiosWrapper.post("/api/customer-auth/login", data);
+
+export const logoutCustomerSelf = () =>
+  axiosWrapper.post("/api/customer-auth/logout");
+
+export const getCustomerSelfMe = () =>
+  axiosWrapper.get("/api/customer-auth/me");
+
+export const addSelfOrder = (data) =>
+  axiosWrapper.post("/api/order/self", data);
+
+export const getMyOrders = () =>
+  axiosWrapper.get("/api/order/mine");

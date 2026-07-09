@@ -507,10 +507,94 @@ const deleteOrder = async (req, res, next) => {
   }
 };
 
+// =======================================
+// Create Order (self-service, diner logged in via QR code)
+// =======================================
+// Same idea as addOrder above, but the customer/customerDetails come
+// from the authenticated diner (req.customer) instead of being typed
+// in by a waiter, and there's no staff member on the order at all -
+// a waiter will still see it appear on the Orders board to prepare it.
+const createSelfOrder = async (req, res, next) => {
+  try {
+    const { bills, items, table, paymentMethod } = req.body;
+
+    if (!bills) return errorResponse(next, 400, "Bill details are required.");
+    if (!items || !items.length)
+      return errorResponse(next, 400, "Order items are required.");
+    if (!table) return errorResponse(next, 400, "Table is required.");
+
+    if (!validateObjectId(table)) {
+      return errorResponse(next, 400, "Invalid table ID.");
+    }
+
+    const tableData = await Table.findById(table);
+
+    if (!tableData) {
+      return errorResponse(next, 404, "Table not found.");
+    }
+
+    if (tableData.status === "Occupied") {
+      return errorResponse(next, 400, "Table already occupied.");
+    }
+
+    const order = await Order.create([
+      {
+        customer: req.customer._id,
+        customerDetails: {
+          name: req.customer.name,
+          phone: req.customer.phone,
+          guests: 1,
+        },
+        bills,
+        items,
+        table,
+        paymentMethod: paymentMethod || "Pay at Table",
+        orderStatus: "In Progress",
+      },
+    ]);
+
+    const createdOrder = order[0];
+
+    tableData.status = "Occupied";
+    tableData.currentOrder = createdOrder._id;
+    await tableData.save();
+
+    emitDashboardUpdate(req, "order:created", {
+      orderId: createdOrder._id,
+      amount: createdOrder.bills?.totalWithTax || 0,
+      status: createdOrder.orderStatus,
+    });
+
+    return successResponse(res, "Order placed successfully.", createdOrder, 201);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+// =======================================
+// Get My Orders (self-service diner's own order history)
+// =======================================
+const getMyOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({ customer: req.customer._id })
+      .populate("table")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return successResponse(res, "Orders fetched successfully.", orders);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 module.exports = {
   addOrder,
   getOrders,
   getOrderById,
   updateOrder,
   deleteOrder,
+  createSelfOrder,
+  getMyOrders,
 };

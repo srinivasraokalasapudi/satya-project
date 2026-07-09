@@ -2,6 +2,7 @@ const createHttpError = require("http-errors");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 const User = require("../models/userModel");
+const Customer = require("../models/customerModel");
 
 
 const isVerifiedUser = async (req, res, next) => {
@@ -69,4 +70,42 @@ const attachUserIfPresent = async (req, res, next) => {
     }
 }
 
-module.exports = { isVerifiedUser, attachUserIfPresent };
+// =======================================================
+// Customer (self-service diner) auth - completely separate
+// from staff auth above. Uses its own cookie name so a
+// customer's phone and a staff member's laptop can each hold
+// their own independent session without clashing.
+// =======================================================
+
+const isVerifiedCustomer = async (req, res, next) => {
+    try {
+
+        let accessToken = req.cookies?.customerAccessToken;
+
+        if (!accessToken && req.headers.authorization?.startsWith("Bearer ")) {
+            accessToken = req.headers.authorization.split(" ")[1];
+        }
+
+        if (!accessToken) {
+            const error = createHttpError(401, "Please login to continue!");
+            return next(error);
+        }
+
+        const decodeToken = jwt.verify(accessToken, config.accessTokenSecret);
+
+        const customer = await Customer.findById(decodeToken._id);
+        if (!customer) {
+            const error = createHttpError(401, "Customer not found!");
+            return next(error);
+        }
+
+        req.customer = customer;
+        next();
+
+    } catch (error) {
+        const err = createHttpError(401, "Invalid Token!");
+        next(err);
+    }
+}
+
+module.exports = { isVerifiedUser, attachUserIfPresent, isVerifiedCustomer };
