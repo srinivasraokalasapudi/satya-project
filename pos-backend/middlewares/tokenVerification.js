@@ -35,4 +35,38 @@ const isVerifiedUser = async (req, res, next) => {
     }
 }
 
-module.exports = { isVerifiedUser };
+// Like isVerifiedUser, but never rejects the request. If a valid token
+// is present, req.user is set; otherwise req.user stays undefined and
+// the request continues as an anonymous/public request. Used for
+// endpoints (like registration) that behave differently for a logged
+// in Admin vs. the general public, without requiring login.
+const attachUserIfPresent = async (req, res, next) => {
+    try {
+
+        let accessToken = req.cookies?.accessToken;
+
+        if (!accessToken && req.headers.authorization?.startsWith("Bearer ")) {
+            accessToken = req.headers.authorization.split(" ")[1];
+        }
+
+        if (!accessToken) {
+            return next();
+        }
+
+        const decodeToken = jwt.verify(accessToken, config.accessTokenSecret);
+        const user = await User.findById(decodeToken._id);
+
+        if (user) {
+            req.user = user;
+        }
+
+        next();
+
+    } catch (error) {
+        // Invalid/expired token on an optional-auth route just means
+        // we treat the request as anonymous, not an error.
+        next();
+    }
+}
+
+module.exports = { isVerifiedUser, attachUserIfPresent };

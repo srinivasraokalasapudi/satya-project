@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import restaurant from "../assets/images/restaurant-img.jpg"
 import logo from "../assets/images/logo.png"
+import Register from "../components/auth/Register";
 import Login from "../components/auth/Login";
 
 const Auth = () => {
@@ -8,6 +9,8 @@ const Auth = () => {
   useEffect(() => {
     document.title = "POS | Auth"
   }, [])
+
+  const [isRegister, setIsRegister] = useState(false);
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen w-full">
@@ -35,15 +38,25 @@ const Auth = () => {
         </div>
 
         <h2 className="text-2xl sm:text-4xl text-center mt-10 font-semibold text-yellow-400 mb-10">
-          Employee Login
+          {isRegister ? "Employee Sign Up" : "Employee Login"}
         </h2>
 
         {/* Components */}
-        <Login />
+        {isRegister ? (
+          <Register setIsRegister={setIsRegister} isAdminCreating={false} />
+        ) : (
+          <Login />
+        )}
 
         <div className="flex justify-center mt-6">
-          <p className="text-sm text-[#ababab] text-center">
-            Don't have an account? Ask your Admin to create one for you.
+          <p className="text-sm text-[#ababab]">
+            {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+            <button
+              onClick={() => setIsRegister(!isRegister)}
+              className="text-yellow-400 font-semibold hover:underline bg-transparent border-none cursor-pointer"
+            >
+              {isRegister ? "Sign in" : "Sign up"}
+            </button>
           </p>
         </div>
 

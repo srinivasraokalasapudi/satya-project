@@ -9,7 +9,7 @@ const register = async (req, res, next) => {
 
         const { name, phone, email, password, role } = req.body;
 
-        if(!name || !phone || !email || !password || !role){
+        if(!name || !phone || !email || !password){
             const error = createHttpError(400, "All fields are required!");
             return next(error);
         }
@@ -20,12 +20,48 @@ const register = async (req, res, next) => {
             return next(error);
         }
 
+        // Only a logged-in Admin is trusted to choose a role (e.g. to
+        // create another Admin or a Cashier). Anyone signing up
+        // publicly/anonymously always gets the safe, view-only
+        // "Waiter" role, no matter what the request body claims -
+        // this stops someone from self-promoting to Admin.
+        const requesterIsAdmin = req.user && req.user.role === "Admin";
+        const finalRole = requesterIsAdmin && role ? role : "Waiter";
 
-        const user = { name, phone, email, password, role };
+        const user = { name, phone, email, password, role: finalRole };
         const newUser = User(user);
         await newUser.save();
 
-        res.status(201).json({success: true, message: "New user created!", data: newUser});
+        // Only auto sign-in for a genuine public/anonymous sign-up. If
+        // an Admin is creating this account on someone else's behalf,
+        // do NOT set the accessToken cookie - that would silently log
+        // the Admin out of their own session and into the new account.
+        if (!requesterIsAdmin) {
+            const accessToken = jwt.sign({_id: newUser._id}, config.accessTokenSecret, {
+                expiresIn : '1d'
+            });
+
+            const isProduction = process.env.NODE_ENV === "production";
+            res.cookie("accessToken", accessToken, {
+                maxAge: 1000 * 60 * 60 * 24 * 30,
+                httpOnly: true,
+                sameSite: isProduction ? "none" : "lax",
+                secure: isProduction,
+            });
+
+            return res.status(201).json({
+                success: true,
+                message: "New user created!",
+                data: newUser,
+                accessToken: accessToken
+            });
+        }
+
+        res.status(201).json({
+            success: true,
+            message: "New user created!",
+            data: newUser
+        });
 
 
     } catch (error) {

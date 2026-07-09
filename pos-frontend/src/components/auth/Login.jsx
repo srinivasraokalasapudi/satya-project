@@ -34,7 +34,7 @@ const Login = () => {
             localStorage.setItem("accessToken", data.accessToken);
           }
           dispatch(setUser({ _id, name, email, phone, role }));
-          navigate("/");
+          navigate(role === "Admin" ? "/dashboard" : "/");
       },
       onError: (error) => {
         const { response } = error;

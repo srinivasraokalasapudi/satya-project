@@ -33,7 +33,7 @@ function Layout() {
   const isLoading = useLoadData();
   const location = useLocation();
   const hideHeaderRoutes = ["/auth"];
-  const { isAuth } = useSelector((state) => state.user);
+  const { isAuth, role } = useSelector((state) => state.user);
 
   if (isLoading) return <FullScreenLoader />;
 
@@ -54,7 +54,13 @@ function Layout() {
 
         <Route
           path="/auth"
-          element={isAuth ? <Navigate to="/" /> : <Auth />}
+          element={
+            isAuth ? (
+              <Navigate to={role === "Admin" ? "/dashboard" : "/"} />
+            ) : (
+              <Auth />
+            )
+          }
         />
 
         <Route

@@ -246,7 +246,7 @@ const StaffManagement = () => {
             onClose={() => setIsCreateAccountOpen(false)}
             title="Create Employee Login Account"
           >
-            <Register setIsRegister={() => setIsCreateAccountOpen(false)} />
+            <Register setIsRegister={() => setIsCreateAccountOpen(false)} isAdminCreating={true} />
           </Modal>
         </>
       )}
