@@ -5,6 +5,7 @@ const Order = require("../models/orderModel");
 const Table = require("../models/tableModel");
 const Stats = require("../models/statsModel");
 const Staff = require("../models/Staff");
+const Customer = require("../models/customerModel");
 const { startOfDay, startOfWeek, startOfMonth } = require("../utils/dateRanges");
 // =======================================
 // Helpers
@@ -80,6 +81,47 @@ const updateStaffStats = async (staffId, amount) => {
   staffDoc.monthlyRevenue += amount;
 
   await staffDoc.save();
+};
+
+// Keeps a customer's profile in the "Customers" admin tab in sync with
+// what they actually order. Anyone who signs up on the self-service
+// home page (or is linked to a walk-in order by matching phone number)
+// gets their totalOrders/totalSpent/loyaltyPoints/status bumped the
+// moment one of their orders is marked Completed - no manual data
+// entry required.
+const LOYALTY_POINTS_PER_RUPEE = 0.1; // 1 point per ₹10 spent
+const VIP_SPEND_THRESHOLD = 5000; // lifetime spend to become VIP
+const VIP_ORDER_THRESHOLD = 15; // ...or this many completed orders
+
+const updateCustomerStats = async (customerId, amount) => {
+  if (!customerId) return;
+
+  const customerDoc = await Customer.findById(customerId);
+  if (!customerDoc) return;
+
+  customerDoc.totalOrders += 1;
+  customerDoc.totalSpent += amount;
+  customerDoc.lastOrderDate = new Date();
+  customerDoc.loyaltyPoints += Math.round(amount * LOYALTY_POINTS_PER_RUPEE);
+
+  customerDoc.status =
+    customerDoc.totalSpent >= VIP_SPEND_THRESHOLD ||
+    customerDoc.totalOrders >= VIP_ORDER_THRESHOLD
+      ? "VIP"
+      : "Regular";
+
+  await customerDoc.save();
+};
+
+// Best-effort link from a staff-taken order to an existing Customer
+// record with the same phone number, so their profile keeps updating
+// even when a waiter (not the diner) types in the order - e.g. the
+// diner signed up earlier but is ordering at the counter this time.
+// Never creates a new Customer here; only self-service signup does
+// that, to avoid quietly enrolling walk-ins who never opted in.
+const findCustomerByPhone = async (phone) => {
+  if (!phone) return null;
+  return Customer.findOne({ phone });
 };
 
 const successResponse = (
@@ -175,10 +217,20 @@ const addOrder = async (req, res, next) => {
       }
     }
 
+    // If no explicit customer id was passed, see if this phone number
+    // already belongs to a signed-up customer and link the order to
+    // them automatically, so their profile in the Customers tab stays
+    // accurate even for orders a waiter keys in.
+    let linkedCustomerId = customer;
+    if (!linkedCustomerId && customerDetails?.phone) {
+      const matchedCustomer = await findCustomerByPhone(customerDetails.phone);
+      if (matchedCustomer) linkedCustomerId = matchedCustomer._id;
+    }
+
     const order = await Order.create(
       [
         {
-          customer,
+          customer: linkedCustomerId,
           customerDetails,
           bills,
           items,
@@ -386,6 +438,15 @@ const updateOrder = async (req, res, next) => {
       if (order.staff) {
         await updateStaffStats(
           order.staff,
+          Number(order.bills?.totalWithTax || 0)
+        );
+      }
+
+      // Keep the linked customer's profile (orders, spend, loyalty
+      // points, VIP status) in sync automatically.
+      if (order.customer) {
+        await updateCustomerStats(
+          order.customer,
           Number(order.bills?.totalWithTax || 0)
         );
       }
