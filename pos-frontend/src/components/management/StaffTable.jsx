@@ -65,22 +65,30 @@ const StaffTable = ({ staff, onEdit, onDelete }) => {
                 </td>
 
                 <td className="text-center">
-                  <div className="flex justify-center gap-4">
-                    <button
-                      onClick={() => onEdit(member)}
-                      className="text-blue-400 hover:text-blue-300"
-                      title="Edit staff"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => onDelete(member)}
-                      className="text-red-400 hover:text-red-300"
-                      title="Remove staff"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
+                  {onEdit || onDelete ? (
+                    <div className="flex justify-center gap-4">
+                      {onEdit && (
+                        <button
+                          onClick={() => onEdit(member)}
+                          className="text-blue-400 hover:text-blue-300"
+                          title="Edit staff"
+                        >
+                          <FaEdit />
+                        </button>
+                      )}
+                      {onDelete && (
+                        <button
+                          onClick={() => onDelete(member)}
+                          className="text-red-400 hover:text-red-300"
+                          title="Remove staff"
+                        >
+                          <FaTrash />
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-gray-600 text-sm">View only</span>
+                  )}
                 </td>
               </tr>
             ))

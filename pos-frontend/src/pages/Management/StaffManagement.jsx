@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
 import {
@@ -7,13 +8,16 @@ import {
   FaMoneyBillWave,
   FaCalendarDay,
   FaPlus,
+  FaUserShield,
 } from "react-icons/fa";
 
 import { getStaffReports, addStaff, updateStaff, deleteStaff } from "../../https";
 import FullScreenLoader from "../../components/shared/FullScreenLoader";
 import ConfirmDialog from "../../components/shared/ConfirmDialog";
+import Modal from "../../components/shared/Modal";
 import StaffTable from "../../components/management/StaffTable";
 import StaffFormModal from "../../components/management/StaffFormModal";
+import Register from "../../components/auth/Register";
 
 const currency = new Intl.NumberFormat("en-IN", {
   style: "currency",
@@ -27,10 +31,13 @@ const StaffManagement = () => {
   }, []);
 
   const queryClient = useQueryClient();
+  const userData = useSelector((state) => state.user);
+  const isAdmin = userData?.role === "Admin";
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState(null);
   const [deletingStaff, setDeletingStaff] = useState(null);
+  const [isCreateAccountOpen, setIsCreateAccountOpen] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["staff-reports"],
@@ -158,16 +165,28 @@ const StaffManagement = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setEditingStaff(null);
-            setIsFormOpen(true);
-          }}
-          className="bg-yellow-400 text-black px-5 py-3 rounded-xl font-semibold flex items-center gap-2"
-        >
-          <FaPlus />
-          Add Staff
-        </button>
+        {isAdmin && (
+          <div className="flex gap-3">
+            <button
+              onClick={() => setIsCreateAccountOpen(true)}
+              className="bg-[#333] text-white px-5 py-3 rounded-xl font-semibold flex items-center gap-2"
+            >
+              <FaUserShield />
+              Create Login Account
+            </button>
+
+            <button
+              onClick={() => {
+                setEditingStaff(null);
+                setIsFormOpen(true);
+              }}
+              className="bg-yellow-400 text-black px-5 py-3 rounded-xl font-semibold flex items-center gap-2"
+            >
+              <FaPlus />
+              Add Staff
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mt-8">
@@ -184,37 +203,53 @@ const StaffManagement = () => {
 
       <StaffTable
         staff={staff}
-        onEdit={(member) => {
-          setEditingStaff(member);
-          setIsFormOpen(true);
-        }}
-        onDelete={(member) => setDeletingStaff(member)}
-      />
-
-      <StaffFormModal
-        isOpen={isFormOpen}
-        onClose={() => {
-          setIsFormOpen(false);
-          setEditingStaff(null);
-        }}
-        onSubmit={handleSubmit}
-        initialData={editingStaff}
-        isSubmitting={createMutation.isPending || updateMutation.isPending}
-      />
-
-      <ConfirmDialog
-        isOpen={!!deletingStaff}
-        title="Remove staff member?"
-        message={
-          deletingStaff
-            ? `This will permanently remove ${deletingStaff.name} from staff.`
-            : ""
+        onEdit={
+          isAdmin
+            ? (member) => {
+                setEditingStaff(member);
+                setIsFormOpen(true);
+              }
+            : undefined
         }
-        confirmText="Remove"
-        cancelText="Cancel"
-        onConfirm={() => deleteMutation.mutate(deletingStaff._id)}
-        onCancel={() => setDeletingStaff(null)}
+        onDelete={isAdmin ? (member) => setDeletingStaff(member) : undefined}
       />
+
+      {isAdmin && (
+        <>
+          <StaffFormModal
+            isOpen={isFormOpen}
+            onClose={() => {
+              setIsFormOpen(false);
+              setEditingStaff(null);
+            }}
+            onSubmit={handleSubmit}
+            initialData={editingStaff}
+            isSubmitting={createMutation.isPending || updateMutation.isPending}
+          />
+
+          <ConfirmDialog
+            isOpen={!!deletingStaff}
+            title="Remove staff member?"
+            message={
+              deletingStaff
+                ? `This will permanently remove ${deletingStaff.name} from staff.`
+                : ""
+            }
+            confirmText="Remove"
+            cancelText="Cancel"
+            onConfirm={() => deleteMutation.mutate(deletingStaff._id)}
+            onCancel={() => setDeletingStaff(null)}
+          />
+
+          <Modal
+            isOpen={isCreateAccountOpen}
+            onClose={() => setIsCreateAccountOpen(false)}
+            title="Create Employee Login Account"
+          >
+            <Register setIsRegister={() => setIsCreateAccountOpen(false)} />
+          </Modal>
+        </>
+      )}
     </div>
   );
 };

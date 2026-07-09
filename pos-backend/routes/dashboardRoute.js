@@ -5,6 +5,8 @@ const {
   getDashboardStats,
 } = require("../controllers/dashboardController");
 
-router.get("/", getDashboardStats);
+const { isVerifiedUser } = require("../middlewares/tokenVerification");
+
+router.get("/", isVerifiedUser, getDashboardStats);
 
 module.exports = router;

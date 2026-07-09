@@ -1,11 +1,13 @@
 const express = require("express");
 const { register, login, getUserData, logout } = require("../controllers/userController");
 const { isVerifiedUser } = require("../middlewares/tokenVerification");
+const { isAdmin } = require("../middlewares/roleVerification");
 const router = express.Router();
 
 
 // Authentication Routes
-router.route("/register").post(register);
+// Only an Admin can create new login accounts (e.g. for new staff members)
+router.route("/register").post(isVerifiedUser, isAdmin, register);
 router.route("/login").post(login);
 router.route("/logout").post(logout)
 

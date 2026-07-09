@@ -1,11 +1,13 @@
 const express=require("express");
 const router=express.Router();
 const c=require("../controllers/reportController");
-router.get("/dashboard",c.getDashboardReport);
-router.get("/sales",c.getSalesReport);
-router.get("/daily",c.getDailySales);
-router.get("/weekly",c.getWeeklySales);
-router.get("/monthly",c.getMonthlySales);
-router.get("/top-items",c.getTopSellingItems);
-router.get("/payments",c.getPaymentReport);
+const { isVerifiedUser }=require("../middlewares/tokenVerification");
+
+router.get("/dashboard",isVerifiedUser,c.getDashboardReport);
+router.get("/sales",isVerifiedUser,c.getSalesReport);
+router.get("/daily",isVerifiedUser,c.getDailySales);
+router.get("/weekly",isVerifiedUser,c.getWeeklySales);
+router.get("/monthly",isVerifiedUser,c.getMonthlySales);
+router.get("/top-items",isVerifiedUser,c.getTopSellingItems);
+router.get("/payments",isVerifiedUser,c.getPaymentReport);
 module.exports=router;

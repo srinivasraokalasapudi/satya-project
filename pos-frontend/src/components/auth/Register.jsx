@@ -112,11 +112,31 @@ const Register = ({setIsRegister}) => {
             />
           </div>
         </div>
+        <div>
+          <label className="block text-[#ababab] mb-2 mt-3 text-sm font-medium">
+            Role
+          </label>
+          <div className="flex item-center rounded-lg p-5 px-4 bg-[#1f1f1f]">
+            <input
+              type="text"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              placeholder="e.g. Waiter, Cashier, Admin"
+              className="bg-transparent flex-1 text-white focus:outline-none"
+              required
+            />
+          </div>
+          <p className="text-xs text-[#777] mt-1">
+            Only give the "Admin" role to people who should be able to add/edit/delete anything.
+            Everyone else can view all content but can't make changes.
+          </p>
+        </div>
         <button
           type="submit"
           className="w-full rounded-lg mt-6 py-3 text-lg bg-yellow-400 text-gray-900 font-bold"
         >
-          Sign up
+          Create Account
         </button>
       </form>
     </div>

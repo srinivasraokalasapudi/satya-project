@@ -16,14 +16,17 @@ deleteCustomer
 
 }=require("../controllers/customerController");
 
-router.get("/",getCustomers);
+const { isVerifiedUser }=require("../middlewares/tokenVerification");
+const { isAdmin }=require("../middlewares/roleVerification");
 
-router.get("/:id",getCustomer);
+router.get("/",isVerifiedUser,getCustomers);
 
-router.post("/",createCustomer);
+router.get("/:id",isVerifiedUser,getCustomer);
 
-router.put("/:id",updateCustomer);
+router.post("/",isVerifiedUser,isAdmin,createCustomer);
 
-router.delete("/:id",deleteCustomer);
+router.put("/:id",isVerifiedUser,isAdmin,updateCustomer);
+
+router.delete("/:id",isVerifiedUser,isAdmin,deleteCustomer);
 
 module.exports=router;

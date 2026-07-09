@@ -1,7 +1,10 @@
 const router=require("express").Router();
 const c=require("../controllers/inventoryController");
-router.get("/",c.getInventory);
-router.post("/",c.createInventory);
-router.put("/:id",c.updateInventory);
-router.delete("/:id",c.deleteInventory);
+const { isVerifiedUser }=require("../middlewares/tokenVerification");
+const { isAdmin }=require("../middlewares/roleVerification");
+
+router.get("/",isVerifiedUser,c.getInventory);
+router.post("/",isVerifiedUser,isAdmin,c.createInventory);
+router.put("/:id",isVerifiedUser,isAdmin,c.updateInventory);
+router.delete("/:id",isVerifiedUser,isAdmin,c.deleteInventory);
 module.exports=router;
