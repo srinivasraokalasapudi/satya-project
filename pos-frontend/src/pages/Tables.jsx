@@ -53,12 +53,14 @@ const Tables = () => {
     );
   }
 
+  const allTables = [...(resData?.data?.data || [])].sort(
+    (a, b) => a.tableNo - b.tableNo
+  );
+
   const tables =
     status === "all"
-      ? resData?.data?.data || []
-      : resData?.data?.data?.filter(
-          (table) => table.status === "Booked"
-        ) || [];
+      ? allTables
+      : allTables.filter((table) => table.status === "Booked");
 
   const handleTableClick = (table) => {
     if (table.status === "Booked") {
