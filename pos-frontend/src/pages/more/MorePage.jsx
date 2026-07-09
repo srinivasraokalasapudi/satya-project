@@ -27,7 +27,7 @@ import { logout } from "../../https";
 import { removeUser } from "../../redux/slices/userSlice";
 
 const navLinks = [
-  { title: "Staff", description: "Manage roles & shifts", icon: Users2, path: "/management/staff" },
+  { title: "Staff", description: "Manage roles & shifts", icon: Users2, path: "/staff" },
   { title: "Menu", description: "Edit dishes & pricing", icon: UtensilsCrossed, path: "/management/menu" },
   { title: "Inventory", description: "Stock & suppliers", icon: Boxes, path: "/management/inventory" },
   { title: "Payments", description: "Transactions & payouts", icon: CreditCard, path: "/management/payments" },

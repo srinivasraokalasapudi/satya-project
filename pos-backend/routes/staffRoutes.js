@@ -1,5 +1,6 @@
 const router=require("express").Router();
 const c=require("../controllers/staffController");
+router.get("/reports",c.getStaffReports);
 router.get("/",c.getStaff);
 router.post("/",c.createStaff);
 router.put("/:id",c.updateStaff);

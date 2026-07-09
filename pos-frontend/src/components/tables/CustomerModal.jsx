@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
 
 import Modal from "../shared/Modal";
+import { getStaff } from "../../https";
 import {
   setCustomer,
   updateTable,
+  setOrderStaff,
 } from "../../redux/slices/customerSlice";
 
 const CustomerModal = ({
@@ -20,6 +23,17 @@ const CustomerModal = ({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [guests, setGuests] = useState(1);
+  const [staffId, setStaffId] = useState("");
+
+  const { data: staffRes } = useQuery({
+    queryKey: ["staff-list"],
+    queryFn: getStaff,
+    enabled: isOpen,
+  });
+
+  const staffOptions = (staffRes?.data?.data || []).filter(
+    (member) => member.status !== "Inactive"
+  );
 
   const handleStartOrder = () => {
     if (!name.trim()) {
@@ -43,6 +57,15 @@ const CustomerModal = ({
       return;
     }
 
+    if (!staffId) {
+      enqueueSnackbar("Please select the staff taking this order!", {
+        variant: "warning",
+      });
+      return;
+    }
+
+    const selectedStaff = staffOptions.find((member) => member._id === staffId);
+
     dispatch(
       setCustomer({
         name,
@@ -57,6 +80,14 @@ const CustomerModal = ({
           tableId: selectedTable._id,
           tableNo: selectedTable.tableNo,
         },
+      })
+    );
+
+    dispatch(
+      setOrderStaff({
+        id: staffId,
+        name: selectedStaff?.name,
+        role: selectedStaff?.role,
       })
     );
 
@@ -114,6 +145,25 @@ const CustomerModal = ({
             onChange={(e) => setGuests(e.target.value)}
             className="w-full bg-[#262626] text-white rounded-lg px-4 py-3 outline-none"
           />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 mb-2">
+            Staff Taking Order
+          </label>
+
+          <select
+            value={staffId}
+            onChange={(e) => setStaffId(e.target.value)}
+            className="w-full bg-[#262626] text-white rounded-lg px-4 py-3 outline-none"
+          >
+            <option value="">Select staff</option>
+            {staffOptions.map((member) => (
+              <option key={member._id} value={member._id}>
+                {member.name} {member.role ? `(${member.role})` : ""}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button

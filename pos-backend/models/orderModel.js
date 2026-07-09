@@ -58,6 +58,23 @@ const orderSchema = new mongoose.Schema(
       ref: "Table",
     },
 
+    staff: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Staff",
+    },
+
+    // Snapshot of the staff member at the time the order was taken, so
+    // reports keep showing the right name/role even if the Staff record
+    // is edited or removed later (same pattern as customerDetails above).
+    staffDetails: {
+      name: {
+        type: String,
+      },
+      role: {
+        type: String,
+      },
+    },
+
     paymentMethod: {
       type: String,
     },

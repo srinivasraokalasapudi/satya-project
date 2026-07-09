@@ -166,6 +166,7 @@ const Bill = () => {
       items: cartData,
       table: customerData.table.tableId,
       paymentMethod,
+      staff: customerData.staff?.id,
     };
 
     // ---------------- CASH ----------------

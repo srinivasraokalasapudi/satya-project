@@ -4,6 +4,7 @@ const createHttpError = require("http-errors");
 const Order = require("../models/orderModel");
 const Table = require("../models/tableModel");
 const Stats = require("../models/statsModel");
+const Staff = require("../models/Staff");
 // =======================================
 // Helpers
 // =======================================
@@ -80,6 +81,7 @@ const addOrder = async (req, res, next) => {
       table,
       paymentMethod,
       paymentData,
+      staff,
     } = req.body;
 
     if (!customerDetails)
@@ -90,6 +92,20 @@ const addOrder = async (req, res, next) => {
 
     if (!items || !items.length)
       return errorResponse(next, 400, "Order items are required.");
+
+    let staffData = null;
+
+    if (staff) {
+      if (!validateObjectId(staff)) {
+        return errorResponse(next, 400, "Invalid staff ID.");
+      }
+
+      staffData = await Staff.findById(staff);
+
+      if (!staffData) {
+        return errorResponse(next, 404, "Staff not found.");
+      }
+    }
 
     let tableData = null;
 
@@ -119,6 +135,10 @@ const addOrder = async (req, res, next) => {
           table,
           paymentMethod,
           paymentData,
+          staff: staffData ? staffData._id : undefined,
+          staffDetails: staffData
+            ? { name: staffData.name, role: staffData.role }
+            : undefined,
           orderStatus: "In Progress",
         },
       ],
@@ -197,6 +217,7 @@ const getOrders = async (req, res, next) => {
     const orders = await Order.find(query)
       .populate("customer")
       .populate("table")
+      .populate("staff", "name role")
       .sort({
         createdAt: sort === "asc" ? 1 : -1,
       })
@@ -231,6 +252,7 @@ const getOrderById = async (req, res, next) => {
     const order = await Order.findById(id)
       .populate("customer")
       .populate("table")
+      .populate("staff", "name role")
       .lean();
 
     if (!order) {
