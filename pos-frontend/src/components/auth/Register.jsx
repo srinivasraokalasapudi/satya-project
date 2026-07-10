@@ -2,23 +2,17 @@ import React, { useState } from "react";
 import { register } from "../../https/index";
 import { useMutation } from "@tanstack/react-query";
 import { enqueueSnackbar } from "notistack";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { setUser } from "../../redux/slices/userSlice";
 
 // Two ways this form gets used:
 // 1. Public sign-up (Auth page, nobody logged in): isAdminCreating is
 //    false. Role isn't shown/editable - the backend always assigns the
 //    safe, view-only "Waiter" role for anonymous sign-ups. On success
-//    the new user is signed straight in and sent into the app.
+//    the user is sent back to the Sign In form to log in themselves.
 // 2. Admin creating a staff login (Staff Management screen):
 //    isAdminCreating is true. The Admin can pick a role (including
 //    "Admin"), and on success the modal just closes - the Admin's own
 //    session is left untouched.
 const Register = ({ setIsRegister, isAdminCreating = false }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -42,28 +36,21 @@ const Register = ({ setIsRegister, isAdminCreating = false }) => {
       const { data } = res;
       enqueueSnackbar(data.message, { variant: "success" });
 
-      if (isAdminCreating) {
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          password: "",
-          role: "Waiter",
-        });
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+        role: "Waiter",
+      });
 
-        setTimeout(() => {
-          setIsRegister(false);
-        }, 1500);
-        return;
-      }
-
-      // Public sign-up: log the new user straight in.
-      const { _id, name, email, phone, role } = data.data;
-      if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);
-      }
-      dispatch(setUser({ _id, name, email, phone, role }));
-      navigate(role === "Admin" ? "/dashboard" : "/");
+      // Both flows land back on the Sign In form after a successful sign-up:
+      // - Admin creating a staff login: just closes the "create" form.
+      // - Public sign-up: the new user now signs in themselves instead of
+      //   being logged in automatically.
+      setTimeout(() => {
+        setIsRegister(false);
+      }, 1500);
     },
     onError: (error) => {
       const { response } = error;
