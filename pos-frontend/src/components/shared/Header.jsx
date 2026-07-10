@@ -105,10 +105,6 @@ const Header = () => {
             <h1 className="text-white font-semibold">
               {userData.name || "Test User"}
             </h1>
-
-            <p className="text-sm text-gray-400">
-              {userData.role || "Role"}
-            </p>
           </div>
 
           <IoLogOut
