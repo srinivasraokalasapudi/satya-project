@@ -1,9 +1,3 @@
-// Dashboard.jsx
-// NOTE:
-// This is a starter upgraded Dashboard template.
-// Replace your existing src/pages/Dashboard.jsx with this file and
-// keep your existing Metrics and RecentOrders components.
-
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { io } from "socket.io-client";
