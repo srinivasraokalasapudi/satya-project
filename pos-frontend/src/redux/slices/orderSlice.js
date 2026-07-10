@@ -6,7 +6,7 @@ const orderSlice = createSlice({
   name: "orders",
   initialState,
   reducers: {
-    satya: (state, action) => {
+    VASU: (state, action) => {
       state.push(action.payload);
     },
 
@@ -20,6 +20,6 @@ const orderSlice = createSlice({
   },
 });
 
-export const { satya, updateOrderStatus } = orderSlice.actions;
+export const { VASU, updateOrderStatus } = orderSlice.actions;
 
 export default orderSlice.reducer;

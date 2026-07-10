@@ -79,7 +79,7 @@ export const buildReceiptMessage = (order) => {
     .join("\n");
 
   return [
-    "*Satya 5-Star Hotel*",
+    "*VASU 5-Star Hotel*",
     "*Order Receipt*",
     "",
     `Order ID: ${orderId}`,
@@ -118,9 +118,9 @@ export const getWhatsAppReceiptUrl = (order) => {
 // UPI ID below; override with VITE_UPI_ID / VITE_UPI_PAYEE_NAME if that
 // ever changes (e.g. moving to a dedicated business UPI handle).
 const REAL_UPI_VPA = "9515193331@ptyes";
-const DEMO_UPI_VPA = "satya5starhotel@okhdfcbank";
+const DEMO_UPI_VPA = "VASU5starhotel@okhdfcbank";
 const UPI_PAYEE_VPA = import.meta.env.VITE_UPI_ID || REAL_UPI_VPA;
-const UPI_PAYEE_NAME = import.meta.env.VITE_UPI_PAYEE_NAME || "Satya 5-Star Hotel";
+const UPI_PAYEE_NAME = import.meta.env.VITE_UPI_PAYEE_NAME || "VASU 5-Star Hotel";
 
 // True whenever VITE_UPI_ID hasn't been set to a real business UPI ID, so
 // the UI can warn the waiter instead of handing out a QR that will never

@@ -58,7 +58,7 @@ const CustomerAuth = ({ tableNo }) => {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-[#f5f5f5] text-2xl font-bold tracking-wide">
-            Satya 5-Star Restaurant
+            VASU 5-Star Restaurant
           </h1>
           {tableNo && (
             <p className="text-[#f6b100] font-semibold mt-1">

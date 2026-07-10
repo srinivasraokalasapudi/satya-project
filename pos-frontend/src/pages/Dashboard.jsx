@@ -13,7 +13,7 @@ const tabs = ["Metrics", "Orders", "Payments", "Staff"];
 
 const Dashboard = () => {
   useEffect(() => {
-    document.title = "Satya POS | Dashboard";
+    document.title = "VASU POS | Dashboard";
   }, []);
 
   const [activeTab, setActiveTab] = useState("Metrics");

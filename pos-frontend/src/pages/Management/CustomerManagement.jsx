@@ -22,7 +22,7 @@ const currency = new Intl.NumberFormat("en-IN", {
 //     (updateCustomerStats in orderController.js)
 const CustomerManagement = () => {
   useEffect(() => {
-    document.title = "Satya POS | Customers";
+    document.title = "VASU POS | Customers";
   }, []);
 
   const [searchTerm, setSearchTerm] = useState("");

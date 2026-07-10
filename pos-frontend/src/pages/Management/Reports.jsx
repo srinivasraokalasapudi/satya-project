@@ -21,7 +21,7 @@ const currency = new Intl.NumberFormat("en-IN", {
 
 const Reports = () => {
   useEffect(() => {
-    document.title = "Satya POS | Reports";
+    document.title = "VASU POS | Reports";
   }, []);
 
   const { data, isLoading } = useQuery({

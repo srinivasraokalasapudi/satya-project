@@ -25,7 +25,7 @@ const LogoutButton = ({ onConfirm }) => {
 
       <Modal isOpen={open} onClose={() => setOpen(false)} title="Confirm Logout">
         <p className="text-gray-300 text-sm mb-6">
-          Are you sure you want to log out of Satya POS? You'll need to sign in again to access the dashboard.
+          Are you sure you want to log out of VASU POS? You'll need to sign in again to access the dashboard.
         </p>
         <div className="flex gap-3">
           <button

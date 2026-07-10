@@ -115,7 +115,7 @@ const More = () => {
   } = useOrdersOverview();
 
   useEffect(() => {
-    document.title = "Satya POS | More";
+    document.title = "VASU POS | More";
   }, []);
 
   const overviewStats = [

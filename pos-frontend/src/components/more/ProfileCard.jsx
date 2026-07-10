@@ -56,13 +56,13 @@ const ProfileCard = ({ userName, userRole }) => {
       <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div className="flex items-center gap-5">
           <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-2 border-gold/40 shadow-gold-glow bg-black/40 flex items-center justify-center shrink-0">
-            <img src={logo} alt="Satya 5-Star Restaurant" className="w-full h-full object-cover" />
+            <img src={logo} alt="VASU 5-Star Restaurant" className="w-full h-full object-cover" />
           </div>
 
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-white text-2xl md:text-3xl font-bold tracking-wide">
-                Satya 5-Star Restaurant
+                VASU 5-Star Restaurant
               </h1>
               <span
                 className={`inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-2.5 py-1 border ${

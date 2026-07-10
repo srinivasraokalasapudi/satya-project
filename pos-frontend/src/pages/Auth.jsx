@@ -44,8 +44,8 @@ const Auth = () => {
       {/* Right Section - full width on mobile, half width from md up */}
       <div className="w-full md:w-1/2 min-h-screen bg-[#1a1a1a] px-6 py-10 sm:p-10">
         <div className="flex flex-col items-center gap-2">
-          <img src={logo} alt="Restro Logo" className="h-14 w-14 border-2 rounded-full p-1" />
-          <h1 className="text-lg font-semibold text-[#f5f5f5] tracking-wide text-center">Satya 5-Star Hotel</h1>
+          <img src={logo} alt="Hotel Logo" className="h-14 w-14 border-2 rounded-full p-1" />
+          <h1 className="text-lg font-semibold text-[#f5f5f5] tracking-wide text-center">VASU 5-Star Hotel</h1>
         </div>
 
         {/* Employee / Admin tabs */}

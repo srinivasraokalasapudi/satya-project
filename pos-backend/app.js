@@ -54,7 +54,7 @@ app.use(cookieParser());
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Satya 5-Star Hotel POS API Running Successfully 🚀",
+    message: "VASU 5-Star Hotel POS API Running Successfully 🚀",
     version: "1.0.0",
     timestamp: new Date(),
   });
@@ -126,7 +126,7 @@ const PORT = config.port || process.env.PORT || 5000;
 
 server.listen(PORT, () => {
   console.log("=======================================");
-  console.log("🚀 Satya 5-Star Hotel POS Backend");
+  console.log("🚀 VASU 5-Star Hotel POS Backend");
   console.log(`🌐 Server Running : http://localhost:${PORT}`);
   console.log("=======================================");
 });

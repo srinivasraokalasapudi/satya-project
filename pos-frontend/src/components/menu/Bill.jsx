@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { enqueueSnackbar } from "notistack";
-import { satya as addOrderRedux } from "../../redux/slices/orderSlice";
+import { VASU as addOrderRedux } from "../../redux/slices/orderSlice";
 
 import {
   getTotalPrice,
@@ -258,7 +258,7 @@ const Bill = () => {
 
         order_id: data.order.id,
 
-        name: "Satya 5-Star Hotel",
+        name: "VASU 5-Star Hotel",
 
         description: "Restaurant POS Payment",
 
@@ -339,7 +339,7 @@ const Bill = () => {
 
   const upiPaymentUrl = buildUpiPaymentUrl({
     amount: totalPriceWithTax,
-    note: `Table ${customerData.table?.tableNo ?? ""} - Satya 5-Star Hotel`,
+    note: `Table ${customerData.table?.tableNo ?? ""} - VASU 5-Star Hotel`,
     refId: customerData.orderId,
   });
 

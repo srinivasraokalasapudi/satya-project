@@ -27,7 +27,7 @@ const currency = new Intl.NumberFormat("en-IN", {
 
 const StaffManagement = () => {
   useEffect(() => {
-    document.title = "Satya POS | Staff";
+    document.title = "VASU POS | Staff";
   }, []);
 
   const queryClient = useQueryClient();

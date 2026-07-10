@@ -27,7 +27,7 @@ const VersionFooter = () => {
     <GlassCard className="p-5 md:p-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <p className="text-white font-semibold text-sm tracking-wide">Satya POS</p>
+          <p className="text-white font-semibold text-sm tracking-wide">VASU POS</p>
           <p className="text-gray-500 text-xs mt-0.5">Version {APP_VERSION}</p>
         </div>
 
@@ -38,7 +38,7 @@ const VersionFooter = () => {
         </div>
 
         <p className="text-gray-600 text-xs">
-          &copy; {new Date().getFullYear()} Satya 5-Star Restaurant
+          &copy; {new Date().getFullYear()} VASU 5-Star Restaurant
         </p>
       </div>
     </GlassCard>

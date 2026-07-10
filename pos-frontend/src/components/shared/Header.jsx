@@ -48,14 +48,14 @@ const Header = () => {
         <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full overflow-hidden border-2 border-yellow-400 shadow-lg bg-white flex items-center justify-center shrink-0">
           <img
             src={logo}
-            alt="Satya 5-Star Hotel"
+            alt="VASU 5-Star Hotel"
             className="w-full h-full object-cover"
           />
         </div>
 
         <div>
           <h1 className="text-base sm:text-2xl font-bold text-white tracking-wide leading-tight">
-            Satya 5-Star Hotel
+            VASU 5-Star Hotel
           </h1>
           <p className="text-[10px] sm:text-xs text-yellow-400 tracking-[0.2em] sm:tracking-[0.25em]">
             ★★★★★ PREMIUM DINING

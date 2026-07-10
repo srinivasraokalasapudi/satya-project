@@ -10,7 +10,7 @@ const inventory = [
 
 const Inventory = () => {
   useEffect(() => {
-    document.title = "Satya POS | Inventory";
+    document.title = "VASU POS | Inventory";
   }, []);
 
   return (
