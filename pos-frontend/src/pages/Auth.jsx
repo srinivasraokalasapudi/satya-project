@@ -37,7 +37,7 @@ const Auth = () => {
         <blockquote className="absolute bottom-10 px-8 mb-10 text-2xl italic text-white">
           "More Than a Meal—An Unforgettable Experience."
           <br />
-          <span className="block mt-4 text-yellow-400">- By "Satvik Kalasapudi"</span>
+          <span className="block mt-4 text-yellow-400">- By "SriniVasaRao Kalasapudi"</span>
         </blockquote>
       </div>
 
