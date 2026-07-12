@@ -150,3 +150,8 @@ export const addSelfOrder = (data) =>
 
 export const getMyOrders = () =>
   axiosWrapper.get("/api/order/mine");
+
+export const getRecommendations = (cartNames = []) =>
+  axiosWrapper.get("/api/recommendation", {
+    params: { cart: cartNames.join(",") },
+  });

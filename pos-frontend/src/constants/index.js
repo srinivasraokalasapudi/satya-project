@@ -12,7 +12,7 @@ const menuConfig = [
   { name: "Beverage", icon: "🥤", bgColor: "#06B6D4", categories: ["Beverage"] },
 ];
 
-const allFoods = foods.map((item, index) => ({
+export const allFoods = foods.map((item, index) => ({
   ...item,
   id: index + 1,
 }));

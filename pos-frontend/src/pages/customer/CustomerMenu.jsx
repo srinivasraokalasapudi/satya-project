@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
 import MenuContainer from "../../components/menu/MenuContainer";
+import RecommendedForYou from "../../components/menu/RecommendedForYou";
 import CartInfo from "../../components/menu/CartInfo";
 import { getTotalPrice, removeAllItems } from "../../redux/slices/cartSlice";
 import { removeDiner } from "../../redux/slices/dinerSlice";
@@ -86,6 +87,8 @@ const CustomerMenu = ({ tableId, tableNo }) => {
             Not you? Log out
           </button>
         </div>
+
+        <RecommendedForYou />
 
         <div className="pb-4">
           <MenuContainer />

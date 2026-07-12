@@ -89,6 +89,9 @@ app.use("/api/customer", require("./routes/customerRoute"));
 // Customer self-service auth (sign up / login to order for yourself)
 app.use("/api/customer-auth", require("./routes/customerAuthRoute"));
 
+// AI-powered dish recommendations for the diner self-order screen
+app.use("/api/recommendation", require("./routes/recommendationRoute"));
+
 // Dashboard
 app.use("/api/dashboard", require("./routes/dashboardRoute"));
 

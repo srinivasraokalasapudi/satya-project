@@ -20,7 +20,8 @@ axiosWrapper.interceptors.request.use((config) => {
   const isCustomerSelfServiceRoute =
     config.url?.startsWith("/api/customer-auth") ||
     config.url?.startsWith("/api/order/self") ||
-    config.url?.startsWith("/api/order/mine");
+    config.url?.startsWith("/api/order/mine") ||
+    config.url?.startsWith("/api/recommendation");
 
   const token = isCustomerSelfServiceRoute
     ? localStorage.getItem("customerAccessToken")
