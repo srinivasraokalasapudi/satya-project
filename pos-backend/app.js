@@ -44,7 +44,20 @@ connectDB();
 // =========================
 app.use(cors(corsOptions));
 
-app.use(express.json({ limit: "10mb" }));
+app.use(
+  express.json({
+    limit: "10mb",
+    // Razorpay signs the *exact* raw bytes of the webhook body. If we
+    // verify against JSON.stringify(req.body) instead, differences in
+    // key order/whitespace/number formatting can make a legitimate
+    // webhook fail signature verification. Stashing the raw buffer here
+    // (cheap, happens for every request) lets the webhook handler check
+    // against the real bytes without restructuring route order.
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 

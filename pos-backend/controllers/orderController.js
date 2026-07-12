@@ -158,6 +158,42 @@ const addOrder = async (req, res, next) => {
       }
     }
 
+    // For Online payments, the client already ran verifyPayment before
+    // calling this endpoint - but that only proves *a* payment happened,
+    // not that *this* order matches it. Without this check, someone
+    // could pay Razorpay a small amount and then submit an arbitrarily
+    // large order body reusing (or fabricating) that payment reference.
+    let paymentRecord = null;
+
+    if (paymentMethod === "Online") {
+      const paymentId = paymentData?.razorpay_payment_id;
+
+      if (!paymentId) {
+        return errorResponse(next, 400, "Missing payment reference for online order.");
+      }
+
+      paymentRecord = await Payment.findOne({ paymentId });
+
+      if (!paymentRecord || paymentRecord.status !== "captured") {
+        return errorResponse(next, 400, "Payment could not be verified.");
+      }
+
+      if (paymentRecord.consumedByOrder) {
+        return errorResponse(next, 400, "This payment has already been used for another order.");
+      }
+
+      const paidAmount = Number(paymentRecord.amount);
+      const orderTotal = Number(bills?.totalWithTax);
+
+      if (!Number.isFinite(paidAmount) || Math.abs(paidAmount - orderTotal) > 1) {
+        return errorResponse(
+          next,
+          400,
+          "Order total does not match the amount that was paid."
+        );
+      }
+    }
+
     let tableData = null;
 
     if (table) {
@@ -197,6 +233,11 @@ const addOrder = async (req, res, next) => {
     );
 
     const createdOrder = order[0];
+
+    if (paymentRecord) {
+      paymentRecord.consumedByOrder = createdOrder._id;
+      await paymentRecord.save();
+    }
 
     if (tableData) {
       tableData.status = "Occupied";
