@@ -71,7 +71,11 @@ const CustomerMenu = ({ tableId, tableNo }) => {
   return (
     <div className="bg-[#1f1f1f] min-h-screen flex flex-col lg:flex-row">
       {/* Menu */}
-      <div className="w-full lg:flex-[3] flex flex-col min-h-0">
+      <div
+        className={`w-full lg:flex-[3] flex flex-col min-h-0 ${
+          cartData.length > 0 ? "pb-20 lg:pb-0" : ""
+        }`}
+      >
         <div className="flex items-center justify-between flex-wrap gap-3 px-4 sm:px-6 py-4">
           <div>
             <h1 className="text-[#f5f5f5] text-xl sm:text-2xl font-bold tracking-wider">
@@ -96,7 +100,7 @@ const CustomerMenu = ({ tableId, tableNo }) => {
       </div>
 
       {/* Cart / Bill */}
-      <div className="w-full lg:flex-[1] p-4 pb-8 lg:min-h-0">
+      <div id="cart-section" className="w-full lg:flex-[1] p-4 pb-8 lg:min-h-0 scroll-mt-4">
         <div className="bg-[#1a1a1a] rounded-lg flex flex-col">
           <div className="flex-1 overflow-y-auto scrollbar-hide">
             <CartInfo />
@@ -134,6 +138,24 @@ const CustomerMenu = ({ tableId, tableNo }) => {
           </div>
         </div>
       </div>
+
+      {/* Mobile-only floating cart bar. On phones the cart panel above
+          sits below the entire menu, which used to mean scrolling past
+          every dish to check out. This keeps the running total and a
+          one-tap way to get there visible at all times while browsing. */}
+      {cartData.length > 0 && (
+        <button
+          onClick={() =>
+            document
+              .getElementById("cart-section")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#f6b100] text-black flex items-center justify-between px-5 py-3.5 font-bold shadow-lg"
+        >
+          <span>{cartData.length} item{cartData.length > 1 ? "s" : ""} · ₹{totalWithTax.toFixed(2)}</span>
+          <span className="underline">View cart</span>
+        </button>
+      )}
     </div>
   );
 };

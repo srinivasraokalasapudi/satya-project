@@ -99,6 +99,7 @@ const MenuContainer = () => {
             <button
               onClick={() => handleAddToCart(item)}
               className="bg-[#2e4a40] p-2 rounded-lg"
+              aria-label={`Add ${item.name} to cart`}
             >
               <FaShoppingCart className="text-green-500" />
             </button>
@@ -114,17 +115,19 @@ const MenuContainer = () => {
               <button
                 onClick={() => decrement(item.id)}
                 className="text-yellow-500 text-2xl"
+                aria-label={`Decrease ${item.name} quantity`}
               >
                 −
               </button>
 
-              <span className="text-white">
+              <span className="text-white" aria-live="polite">
                 {itemCounts[item.id] || 0}
               </span>
 
               <button
                 onClick={() => increment(item.id)}
                 className="text-yellow-500 text-2xl"
+                aria-label={`Increase ${item.name} quantity`}
               >
                 +
               </button>

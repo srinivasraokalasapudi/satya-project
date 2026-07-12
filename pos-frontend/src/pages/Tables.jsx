@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/shared/BottomNav";
 import BackButton from "../components/shared/BackButton";
+import { TableCardSkeleton } from "../components/shared/Skeleton";
 import TableCard from "../components/tables/TableCard";
 import CustomerModal from "../components/tables/CustomerModal";
 import { updateTable } from "../redux/slices/customerSlice";
@@ -47,14 +48,6 @@ const Tables = () => {
       });
     }
   }, [isError]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[#1f1f1f] text-white text-xl">
-        Loading Tables...
-      </div>
-    );
-  }
 
   const allTables = [...(resData?.data?.data || [])].sort(
     (a, b) => a.tableNo - b.tableNo
@@ -142,7 +135,10 @@ const Tables = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
 
-          {tables.map((table) => (
+          {isLoading ? (
+            Array.from({ length: 10 }).map((_, i) => <TableCardSkeleton key={i} />)
+          ) : (
+            tables.map((table) => (
             <TableCard
               key={table._id}
               id={table._id}
@@ -154,7 +150,8 @@ const Tables = () => {
               refetchTables={() => window.location.reload()}
               onShowQr={setQrTable}
             />
-          ))}
+            ))
+          )}
 
         </div>
 

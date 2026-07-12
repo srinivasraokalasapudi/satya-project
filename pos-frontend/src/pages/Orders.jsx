@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import BottomNav from "../components/shared/BottomNav";
 import OrderCard from "../components/orders/OrderCard";
 import BackButton from "../components/shared/BackButton";
+import { OrderCardSkeleton } from "../components/shared/Skeleton";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getOrders } from "../https";
 import { enqueueSnackbar } from "notistack";
@@ -30,14 +31,6 @@ const Orders = () => {
       });
     }
   }, [isError]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-[#1f1f1f] text-white text-xl">
-        Loading Orders...
-      </div>
-    );
-  }
 
   const orders = resData?.data?.data || [];
 
@@ -118,7 +111,9 @@ const Orders = () => {
       {/* Orders */}
       <div className="lg:h-[calc(100vh-220px)] lg:overflow-y-auto px-4 sm:px-6 lg:px-10 pb-32 lg:pb-40 scrollbar-hide">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-start">
-          {filteredOrders.length > 0 ? (
+          {isLoading ? (
+            Array.from({ length: 6 }).map((_, i) => <OrderCardSkeleton key={i} />)
+          ) : filteredOrders.length > 0 ? (
             filteredOrders.map((order) => (
               <OrderCard key={order._id} order={order} />
             ))
