@@ -8,10 +8,6 @@ import {
 import { lazy, Suspense } from "react";
 import { Home, Auth, Orders, Tables, Menu } from "./pages";
 
-// Less-frequently-visited pages are code-split so their JS only
-// downloads when someone actually navigates there, instead of being
-// part of the bundle every visitor loads just to sign in and take an
-// order.
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const More = lazy(() => import("./pages/More"));
 const Reports = lazy(() => import("./pages/Management/Reports"));
