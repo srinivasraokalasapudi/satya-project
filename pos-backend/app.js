@@ -16,13 +16,45 @@ const allowedOrigins = [
   ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",").map((u) => u.trim()) : []),
 ];
 
+// Stable production domain (does not change between deployments).
+const PRODUCTION_ORIGIN = "https://satya-project-six.vercel.app";
+
+// Vercel gives every deployment (production + every preview build) its own
+// unique hash-based URL, e.g.
+//   https://satya-project-2zzr2o0rb-srinivasraokalasapudi-1696s-projects.vercel.app
+//   https://satya-project-six-<hash>-srinivasraokalasapudi-1696s-projects.vercel.app
+// Hardcoding one URL in CLIENT_URL breaks CORS on every new deployment, so
+// we also accept any *.vercel.app subdomain that belongs to this project
+// (starts with "satya-project" and ends with your Vercel team slug).
+const vercelPreviewRegex =
+  /^https:\/\/satya-project(-[a-z0-9]+)*-srinivasraokalasapudi-1696s-projects\.vercel\.app$/;
+
+function isAllowedOrigin(origin) {
+  return (
+    origin === PRODUCTION_ORIGIN ||
+    allowedOrigins.includes(origin) ||
+    vercelPreviewRegex.test(origin)
+  );
+}
+
 const corsOptions = {
   origin: function (origin, callback) {
     // allow requests with no origin (e.g. curl, mobile apps, server-to-server)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || isAllowedOrigin(origin)) {
       callback(null, true);
     } else {
-      callback(new Error(`CORS blocked for origin: ${origin}`));
+      // IMPORTANT: never callback(new Error(...)) here. When the cors
+      // middleware receives an error it forwards to Express's error
+      // handler, which sends a response with NO Access-Control-Allow-Origin
+      // header at all — the browser then reports it as a CORS failure
+      // (and sometimes as a bare net::ERR_FAILED) even for legitimate,
+      // simply-misconfigured origins, making it hard to tell "blocked on
+      // purpose" apart from "server is down". Passing `false` instead
+      // makes the cors package skip adding CORS headers for THIS origin
+      // only, while still responding normally (204/200) to the preflight,
+      // and logs it server-side so you can see exactly which origin to add.
+      console.warn(`CORS blocked request from origin: ${origin}`);
+      callback(null, false);
     }
   },
   credentials: true,
